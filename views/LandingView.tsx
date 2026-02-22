@@ -58,6 +58,25 @@ const LandingView: React.FC<LandingViewProps> = ({ onLogin, lang, setLang }) => 
               ? '您的數據（庫存、銷售記錄）將私密地儲存在您自己的 Google Drive 中。我們不會訪問您的個人檔案，也不會儲存您的客戶資料。' 
               : 'Your data (inventory, sales) is stored privately in your own Google Drive. We never access your personal files or store your customer data on our servers.'}
           </p>
+          <div className="pt-2 flex gap-4">
+            <a 
+              href="/privacy.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+            >
+              {lang === Language.ZH ? '隱私政策' : 'Privacy Policy'}
+            </a>
+            <span className="text-slate-300">|</span>
+            <a 
+              href="/tos.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+            >
+              {lang === Language.ZH ? '服務條款' : 'Terms of Service'}
+            </a>
+          </div>
         </div>
       </div>
     </div>
