@@ -34,7 +34,8 @@ const App: React.FC = () => {
 
   const [lang, setLang] = useState<Language>(() => {
     const saved = localStorage.getItem('stall_lang');
-    return (saved as Language) || Language.EN;
+    if (saved === Language.EN || saved === Language.ZH) return saved as Language;
+    return Language.EN;
   });
   
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
@@ -55,7 +56,7 @@ const App: React.FC = () => {
 
   const isInitialMount = useRef(true);
   const isHydrated = useRef(false);
-  const t = (TRANSLATIONS as any)[lang];
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
 
   useEffect(() => {
     const savedProducts = localStorage.getItem('stall_products');
@@ -221,25 +222,6 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []); // Stable interval, uses refs for latest state/functions
 
-  const handleTokenExpiry = useCallback(() => {
-    setGoogleToken(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem('google_access_token');
-    localStorage.removeItem('stall_logged_in');
-    if ((window as any).google_access_token) delete (window as any).google_access_token;
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    setIsLoggedIn(false);
-    setGoogleToken(null);
-    localStorage.clear();
-    setProducts(INITIAL_PRODUCTS);
-    setTransactions([]);
-    setReports([]);
-    isHydrated.current = false;
-    if ((window as any).google_access_token) delete (window as any).google_access_token;
-  }, []);
-
   const handleCloudDownload = useCallback(async () => {
     if (!isLoggedIn || !isOnline) return;
     setIsInitialCloudLoading(true);
@@ -260,15 +242,13 @@ const App: React.FC = () => {
         }
         isHydrated.current = true;
         setSyncStatus('synced');
-      } else if (result.error === 'UNAUTHORIZED') {
-        handleTokenExpiry();
       }
     } catch (e) {
       console.error("Cloud restoration failed:", e);
     } finally {
       setIsInitialCloudLoading(false);
     }
-  }, [isLoggedIn, isOnline, handleTokenExpiry]);
+  }, [isLoggedIn, isOnline]);
 
   useEffect(() => {
     if (googleToken) {
@@ -339,6 +319,25 @@ const App: React.FC = () => {
       setLoginError("Failed to initiate login.");
     }
   };
+
+  const handleTokenExpiry = useCallback(() => {
+    setGoogleToken(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('google_access_token');
+    localStorage.removeItem('stall_logged_in');
+    if ((window as any).google_access_token) delete (window as any).google_access_token;
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setIsLoggedIn(false);
+    setGoogleToken(null);
+    localStorage.clear();
+    setProducts(INITIAL_PRODUCTS);
+    setTransactions([]);
+    setReports([]);
+    isHydrated.current = false;
+    if ((window as any).google_access_token) delete (window as any).google_access_token;
+  }, []);
 
   const handleCloudSync = useCallback(async () => {
     if (!navigator.onLine || !isLoggedIn || !googleToken) {

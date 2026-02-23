@@ -24,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({
   isDarkMode = false,
   onToggleDarkMode
 }) => {
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
