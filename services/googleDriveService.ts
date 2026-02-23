@@ -21,6 +21,7 @@ export interface SyncData {
 export interface ConnectionStatus {
   ok: boolean;
   message: string;
+  status?: number;
   details?: {
     libraryLoaded: boolean;
     tokenPresent: boolean;
@@ -57,10 +58,14 @@ export const verifyGoogleConnection = async (): Promise<ConnectionStatus> => {
     
     if (response.ok) {
       const data = await response.json();
-      return { ok: true, message: `Connected as ${data.user.displayName}`, details: { libraryLoaded: false, tokenPresent: true, apiResponse: data } };
+      return { ok: true, message: `Connected as ${data.user.displayName}`, status: response.status, details: { libraryLoaded: false, tokenPresent: true, apiResponse: data } };
     } else {
       const errorData = await response.json();
-      return { ok: false, message: `API Error: ${response.status}`, details: { libraryLoaded: false, tokenPresent: true, apiResponse: errorData } };
+      let message = `API Error: ${response.status}`;
+      if (response.status === 401) {
+        message = "Session expired or unauthorized. Please sign out and sign in again.";
+      }
+      return { ok: false, message, status: response.status, details: { libraryLoaded: false, tokenPresent: true, apiResponse: errorData } };
     }
   } catch (error: any) {
     return { ok: false, message: `Network Error: ${error.message}`, details: { libraryLoaded: false, tokenPresent: true } };
