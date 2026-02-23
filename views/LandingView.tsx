@@ -18,7 +18,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onLogin, lang, setLang }) => 
       <div className="max-w-md w-full text-center space-y-12 z-10">
         <div className="flex flex-col items-center gap-6">
           <div className="w-24 h-24 bg-blue-600 rounded-[32px] flex items-center justify-center shadow-2xl shadow-blue-200">
-            <i className="fas fa-store text-white text-4xl"></i>
+            <i className="fas fa-cash-register text-white text-4xl"></i>
           </div>
           <div className="space-y-2">
             <h1 className="text-5xl font-black tracking-tighter text-slate-900">

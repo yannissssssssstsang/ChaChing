@@ -436,7 +436,7 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 bg-blue-600 rounded-[32px] flex items-center justify-center shadow-2xl shadow-blue-200 animate-bounce mb-8">
-           <i className="fas fa-cloud-download-alt text-white text-3xl"></i>
+           <i className="fas fa-cash-register text-white text-3xl"></i>
         </div>
         <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-2">Restoring Your Stall...</h2>
         <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Syncing Registry & Binary Assets</p>

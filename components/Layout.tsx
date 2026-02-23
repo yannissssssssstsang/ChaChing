@@ -54,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({
       <aside className={`hidden md:flex flex-col w-64 border-r shrink-0 p-6 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <div className="flex items-center gap-3 mb-10 px-2">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-            <i className="fas fa-store text-white"></i>
+            <i className="fas fa-cash-register text-white"></i>
           </div>
           <h1 className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{t.appName}</h1>
         </div>
