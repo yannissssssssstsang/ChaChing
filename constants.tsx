@@ -71,7 +71,9 @@ export const TRANSLATIONS = {
     settlementSkipped: 'No transactions recorded today. Settlement skipped.',
     settlementSuccess: 'Cloud settlement successful',
     settlementFailed: 'Cloud settlement failed',
-    settlementOffline: 'Not logged in or offline. Settlement file downloaded locally only.'
+    settlementOffline: 'Not logged in or offline. Settlement file downloaded locally only.',
+    showImages: 'Show Images',
+    hideImages: 'Hide Images'
   },
   [Language.ZH]: {
     appName: '揸流攤',
@@ -141,7 +143,9 @@ export const TRANSLATIONS = {
     settlementSkipped: '今日暫無交易記錄，無需結算。',
     settlementSuccess: '雲端結算成功',
     settlementFailed: '雲端結算失敗',
-    settlementOffline: '未登錄或離線，結算文件僅下載到本地。'
+    settlementOffline: '未登錄或離線，結算文件僅下載到本地。',
+    showImages: '顯示圖片',
+    hideImages: '隱藏圖片'
   }
 };
 

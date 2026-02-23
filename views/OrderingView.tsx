@@ -34,6 +34,14 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
 
   // Cash calculator state
   const [cashReceived, setCashReceived] = useState<string>('');
+  const [showImages, setShowImages] = useState(() => {
+    const saved = localStorage.getItem('stall_show_images');
+    return saved === null ? true : saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('stall_show_images', String(showImages));
+  }, [showImages]);
 
   useEffect(() => {
     let watchId: number | null = null;
@@ -180,15 +188,24 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.ordering}</h2>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Select items for cart</p>
         </div>
-        <div className="relative w-full sm:w-64">
-          <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
-          <input 
-            type="text" 
-            placeholder="Search products..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 rounded-xl text-sm font-bold outline-none focus:border-blue-500 shadow-sm" 
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <button 
+            onClick={() => setShowImages(!showImages)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all shadow-sm"
+          >
+            <i className={`fas ${showImages ? 'fa-image' : 'fa-font'}`}></i>
+            {showImages ? t.hideImages : t.showImages}
+          </button>
+          <div className="relative w-full sm:w-64">
+            <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+            <input 
+              type="text" 
+              placeholder="Search products..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 rounded-xl text-sm font-bold outline-none focus:border-blue-500 shadow-sm" 
+            />
+          </div>
         </div>
       </div>
 
@@ -216,9 +233,11 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                   return (
                     <button key={product.id} onClick={() => addToCart(product)} disabled={product.stock <= 0} className={`relative flex flex-col p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-left transition-all hover:shadow-md ${product.stock <= 0 ? 'opacity-50 grayscale' : ''}`}>
                       {qty > 0 && <div className="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10">{qty}</div>}
-                      <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 overflow-hidden border border-slate-100">
-                        <img src={product.image || `https://picsum.photos/seed/${product.id}/400`} alt={product.name} className="w-full h-full object-cover" />
-                      </div>
+                      {showImages && (
+                        <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 overflow-hidden border border-slate-100">
+                          <img src={product.image || `https://picsum.photos/seed/${product.id}/400`} alt={product.name} className="w-full h-full object-cover" />
+                        </div>
+                      )}
                       <h3 className="font-bold text-sm text-slate-800 line-clamp-1 uppercase tracking-tight">{product.name}</h3>
                       <div className="flex justify-between w-full items-center mt-1">
                         <span className="text-blue-600 font-extrabold text-base">${product.price}</span>
