@@ -44,15 +44,10 @@ const SETTLEMENTS_FOLDER_NAME = 'Settlements';
  * Verifies if the Google Drive API is accessible with current token.
  */
 export const verifyGoogleConnection = async (): Promise<ConnectionStatus> => {
-  const libraryLoaded = typeof (window as any).google !== 'undefined';
   const token = getAccessToken();
 
-  if (!libraryLoaded) {
-    return { ok: false, message: "Google Identity Library not loaded.", details: { libraryLoaded, tokenPresent: !!token } };
-  }
-
   if (!token) {
-    return { ok: false, message: "No access token found.", details: { libraryLoaded, tokenPresent: false } };
+    return { ok: false, message: "No access token found.", details: { libraryLoaded: false, tokenPresent: false } };
   }
 
   try {
@@ -62,13 +57,13 @@ export const verifyGoogleConnection = async (): Promise<ConnectionStatus> => {
     
     if (response.ok) {
       const data = await response.json();
-      return { ok: true, message: `Connected as ${data.user.displayName}`, details: { libraryLoaded, tokenPresent: true, apiResponse: data } };
+      return { ok: true, message: `Connected as ${data.user.displayName}`, details: { libraryLoaded: false, tokenPresent: true, apiResponse: data } };
     } else {
       const errorData = await response.json();
-      return { ok: false, message: `API Error: ${response.status}`, details: { libraryLoaded, tokenPresent: true, apiResponse: errorData } };
+      return { ok: false, message: `API Error: ${response.status}`, details: { libraryLoaded: false, tokenPresent: true, apiResponse: errorData } };
     }
   } catch (error: any) {
-    return { ok: false, message: `Network Error: ${error.message}`, details: { libraryLoaded, tokenPresent: true } };
+    return { ok: false, message: `Network Error: ${error.message}`, details: { libraryLoaded: false, tokenPresent: true } };
   }
 };
 
