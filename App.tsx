@@ -43,6 +43,7 @@ const App: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('stall_dark_mode') === 'true');
   const [isInitialCloudLoading, setIsInitialCloudLoading] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -278,6 +279,7 @@ const App: React.FC = () => {
           setGoogleToken(data.access_token);
           setIsLoggedIn(true);
           setLoginError(null);
+          setIsLoggingIn(false);
           localStorage.setItem('stall_logged_in', 'true');
           // handleCloudDownload is called by the useEffect below when isLoggedIn changes
         }
@@ -295,6 +297,7 @@ const App: React.FC = () => {
 
   const handleLogin = async () => {
     setLoginError(null);
+    setIsLoggingIn(true);
     try {
       const response = await fetch('/api/auth/google/url');
       if (!response.ok) throw new Error('Failed to get auth URL');
@@ -313,10 +316,20 @@ const App: React.FC = () => {
 
       if (!authWindow) {
         setLoginError("Popup blocked. Please allow popups for this site.");
+        setIsLoggingIn(false);
+      } else {
+        // Monitor window closure to reset loading state if user closes it without finishing
+        const timer = setInterval(() => {
+          if (authWindow.closed) {
+            clearInterval(timer);
+            setIsLoggingIn(false);
+          }
+        }, 1000);
       }
     } catch (err) {
       console.error("Login error:", err);
-      setLoginError("Failed to initiate login.");
+      setLoginError("Failed to initiate login. Please check your connection.");
+      setIsLoggingIn(false);
     }
   };
 
@@ -431,7 +444,7 @@ const App: React.FC = () => {
     setProducts(prev => [...prev, p]);
   };
 
-  if (!isLoggedIn) return <LandingView lang={lang} setLang={setLang} onLogin={handleLogin} />;
+  if (!isLoggedIn) return <LandingView lang={lang} setLang={setLang} onLogin={handleLogin} isLoggingIn={isLoggingIn} loginError={loginError} />;
 
   if (isInitialCloudLoading) {
     return (

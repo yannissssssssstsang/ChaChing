@@ -52,7 +52,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   syncStatus = 'synced',
   onManualSync
 }) => {
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0, message: '' });

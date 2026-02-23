@@ -81,7 +81,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onUpdateSettlementConfig,
   onManualSettle
 }) => {
-  const t = TRANSLATIONS[lang] as any;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalFileInputRef = useRef<HTMLInputElement>(null);
   const brandingInputRef = useRef<HTMLInputElement>(null);
@@ -297,21 +297,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 
         {diagStatus && (
           <div className={`p-4 rounded-2xl border ${diagStatus.ok ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'} animate-scale-in`}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <i className={`fas ${diagStatus.ok ? 'fa-check-circle text-emerald-500' : 'fa-exclamation-circle text-red-500'}`}></i>
-                <p className={`text-xs font-black uppercase ${diagStatus.ok ? 'text-emerald-700' : 'text-red-700'}`}>
-                  {diagStatus.ok ? 'Connection Verified' : 'Connection Failed'}
-                </p>
-              </div>
-              {diagStatus.status === 401 && (
-                <button 
-                  onClick={onLogout}
-                  className="px-3 py-1 bg-red-600 text-white text-[9px] font-black uppercase rounded-lg shadow-sm hover:bg-red-700 transition-colors"
-                >
-                  Sign Out Now
-                </button>
-              )}
+            <div className="flex items-center gap-3 mb-2">
+              <i className={`fas ${diagStatus.ok ? 'fa-check-circle text-emerald-500' : 'fa-exclamation-circle text-red-500'}`}></i>
+              <p className={`text-xs font-black uppercase ${diagStatus.ok ? 'text-emerald-700' : 'text-red-700'}`}>
+                {diagStatus.ok ? 'Connection Verified' : 'Connection Failed'}
+              </p>
             </div>
             <p className="text-xs font-medium text-slate-600">{diagStatus.message}</p>
           </div>

@@ -13,7 +13,7 @@ interface RecordsViewProps {
 type DateRange = 'today' | 'all';
 
 const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund, paymentQRCodes }) => {
-  const t = TRANSLATIONS[lang] as any;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const [range, setRange] = useState<DateRange>('today');
   
   const [refundingTransaction, setRefundingTransaction] = useState<Transaction | null>(null);

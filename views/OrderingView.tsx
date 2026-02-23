@@ -14,7 +14,7 @@ interface OrderingViewProps {
 }
 
 const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteSale, updateStock, customQRCodes = {}, receiptConfig }) => {
-  const t = TRANSLATIONS[lang] as any;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);

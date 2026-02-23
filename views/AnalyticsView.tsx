@@ -16,7 +16,7 @@ type DateRange = 'today' | 'all';
 type SummaryMode = 'item' | 'category';
 
 const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, products }) => {
-  const t = TRANSLATIONS[lang] as any;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const mapRef = useRef<any>(null);
   const [range, setRange] = useState<DateRange>('today');
   const [summaryMode, setSummaryMode] = useState<SummaryMode>('item');
