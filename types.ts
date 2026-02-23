@@ -74,6 +74,8 @@ export interface ReceiptConfig {
   address: string;
   phone: string;
   email: string;
+  instagram?: string;
+  facebook?: string;
 }
 
 export interface SettlementConfig {

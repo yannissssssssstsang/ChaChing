@@ -52,7 +52,7 @@ const App: React.FC = () => {
   const [paymentQRCodes, setPaymentQRCodes] = useState<PaymentQRCodes>({});
   const [changeLogs, setChangeLogs] = useState<ProductChangeLog[]>([]);
   const [telegramConfig, setTelegramConfig] = useState<TelegramConfig>({ botToken: '', chatId: '', alertType: 'both' });
-  const [receiptConfig, setReceiptConfig] = useState<ReceiptConfig>({ companyName: '', address: '', phone: '', email: '' });
+  const [receiptConfig, setReceiptConfig] = useState<ReceiptConfig>({ companyName: '', address: '', phone: '', email: '', instagram: '', facebook: '' });
   const [settlementConfig, setSettlementConfig] = useState<SettlementConfig>({ enabled: false, time: '22:00' });
 
   const isInitialMount = useRef(true);
@@ -243,6 +243,8 @@ const App: React.FC = () => {
         }
         isHydrated.current = true;
         setSyncStatus('synced');
+      } else if (result.error === 'UNAUTHORIZED') {
+        handleTokenExpiry();
       }
     } catch (e) {
       console.error("Cloud restoration failed:", e);
@@ -492,6 +494,7 @@ const App: React.FC = () => {
               settlementConfig={settlementConfig}
               onUpdateSettlementConfig={setSettlementConfig}
               onManualSettle={handleManualSettle}
+              onTokenExpiry={handleTokenExpiry}
             />
           } />
         </Routes>

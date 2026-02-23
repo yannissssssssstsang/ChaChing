@@ -73,7 +73,9 @@ export const TRANSLATIONS = {
     settlementFailed: 'Cloud settlement failed',
     settlementOffline: 'Not logged in or offline. Settlement file downloaded locally only.',
     showImages: 'Show Images',
-    hideImages: 'Hide Images'
+    hideImages: 'Hide Images',
+    instagram: 'Instagram Name',
+    facebook: 'Facebook Name'
   },
   [Language.ZH]: {
     appName: '揸流攤',
@@ -145,7 +147,9 @@ export const TRANSLATIONS = {
     settlementFailed: '雲端結算失敗',
     settlementOffline: '未登錄或離線，結算文件僅下載到本地。',
     showImages: '顯示圖片',
-    hideImages: '隱藏圖片'
+    hideImages: '隱藏圖片',
+    instagram: 'Instagram 名稱',
+    facebook: 'Facebook 名稱'
   }
 };
 

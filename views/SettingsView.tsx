@@ -22,6 +22,7 @@ interface SettingsViewProps {
   settlementConfig: SettlementConfig;
   onUpdateSettlementConfig: (config: SettlementConfig) => void;
   onManualSettle: () => void;
+  onTokenExpiry?: () => void;
 }
 
 interface HKMethod {
@@ -79,7 +80,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   lastSyncTime,
   settlementConfig,
   onUpdateSettlementConfig,
-  onManualSettle
+  onManualSettle,
+  onTokenExpiry
 }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -127,10 +129,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 
   const handleBrandingDriveImport = async (fileId: string) => {
     setIsLoadingDrive(true);
-    const base64 = await getDriveFileAsBase64(fileId);
-    if (base64 && brandingTarget) {
-      const optimized = await optimizeImage(base64);
-      onUpdateReceiptConfig({ ...receiptConfig, [brandingTarget]: optimized });
+    try {
+      const base64 = await getDriveFileAsBase64(fileId);
+      if (base64 && brandingTarget) {
+        const optimized = await optimizeImage(base64);
+        onUpdateReceiptConfig({ ...receiptConfig, [brandingTarget]: optimized });
+      }
+    } catch (err: any) {
+      if (err.message === 'UNAUTHORIZED' && onTokenExpiry) {
+        onTokenExpiry();
+      }
     }
     setIsLoadingDrive(false);
     setShowDrivePicker(false);
@@ -146,7 +154,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   const loadDriveFiles = async () => {
     setIsLoadingDrive(true);
     const result = await listDriveFiles();
-    setDriveFiles(result.files || []);
+    if (result.error === 'UNAUTHORIZED' && onTokenExpiry) {
+      onTokenExpiry();
+      setShowDrivePicker(false);
+    } else {
+      setDriveFiles(result.files || []);
+    }
     setIsLoadingDrive(false);
   };
 
@@ -390,6 +403,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <input type="text" value={receiptConfig.phone} onChange={e => onUpdateReceiptConfig({...receiptConfig, phone: e.target.value})} placeholder="Phone" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-blue-500" />
                 <input type="email" value={receiptConfig.email} onChange={e => onUpdateReceiptConfig({...receiptConfig, email: e.target.value})} placeholder="Email" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-blue-500" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <i className="fab fa-instagram absolute left-4 top-1/2 -translate-y-1/2 text-pink-500"></i>
+                  <input type="text" value={receiptConfig.instagram || ''} onChange={e => onUpdateReceiptConfig({...receiptConfig, instagram: e.target.value})} placeholder={t.instagram} className="w-full p-4 pl-10 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-blue-500" />
+                </div>
+                <div className="relative">
+                  <i className="fab fa-facebook absolute left-4 top-1/2 -translate-y-1/2 text-blue-600"></i>
+                  <input type="text" value={receiptConfig.facebook || ''} onChange={e => onUpdateReceiptConfig({...receiptConfig, facebook: e.target.value})} placeholder={t.facebook} className="w-full p-4 pl-10 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-blue-500" />
+                </div>
               </div>
             </div>
           </div>

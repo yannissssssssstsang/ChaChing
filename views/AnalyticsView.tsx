@@ -232,15 +232,15 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         </div>
         
         <div className="bg-white p-1.5 rounded-[20px] border border-slate-100 shadow-sm flex items-center gap-1">
-          <button onClick={() => setRange('today')} className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'today' ? 'bg-[#494D5F] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>{lang === Language.ZH ? '今日' : 'Today'}</button>
-          <button onClick={() => setRange('all')} className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'all' ? 'bg-[#494D5F] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>{lang === Language.ZH ? '全部' : 'All Time'}</button>
+          <button onClick={() => setRange('today')} className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'today' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>{lang === Language.ZH ? '今日' : 'Today'}</button>
+          <button onClick={() => setRange('all')} className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'all' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>{lang === Language.ZH ? '全部' : 'All Time'}</button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="dashboard-card p-6 bg-[#494D5F] text-white border-0 shadow-lg flex flex-col justify-between">
-          <p className="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">{t.revenue}</p>
-          <p className="text-3xl font-black">${totalRevenue.toLocaleString()}</p>
+        <div className="dashboard-card p-6 border-l-4 border-l-slate-800 flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.revenue}</p>
+          <p className="text-3xl font-black text-slate-800">${totalRevenue.toLocaleString()}</p>
         </div>
         <div className="dashboard-card p-6 border-l-4 border-l-emerald-500 flex flex-col justify-between">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.profit}</p>

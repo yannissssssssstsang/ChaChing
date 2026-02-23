@@ -17,6 +17,7 @@ interface InventoryViewProps {
   onBatchUpdateStock: (productIds: string[], amount: number) => void;
   syncStatus?: SyncStatus;
   onManualSync?: () => Promise<void>;
+  onTokenExpiry?: () => void;
 }
 
 const optimizeImage = (base64: string, maxWidth: number = 500): Promise<string> => {
@@ -50,7 +51,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   changeLogs, 
   onBatchUpdateStock,
   syncStatus = 'synced',
-  onManualSync
+  onManualSync,
+  onTokenExpiry
 }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -93,7 +95,12 @@ const InventoryView: React.FC<InventoryViewProps> = ({
     setIsLoadingDrive(true);
     setDriveError(null);
     const result = await listDriveFiles();
-    if (result.error) setDriveError(result.error);
+    if (result.error === 'UNAUTHORIZED' && onTokenExpiry) {
+      onTokenExpiry();
+      setShowDrivePicker(false);
+    } else if (result.error) {
+      setDriveError(result.error);
+    }
     setDriveFiles(result.files || []);
     setIsLoadingDrive(false);
   };

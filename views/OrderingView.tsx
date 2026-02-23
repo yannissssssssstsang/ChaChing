@@ -188,15 +188,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.ordering}</h2>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Select items for cart</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-          <button 
-            onClick={() => setShowImages(!showImages)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all shadow-sm"
-          >
-            <i className={`fas ${showImages ? 'fa-image' : 'fa-font'}`}></i>
-            {showImages ? t.hideImages : t.showImages}
-          </button>
-          <div className="relative w-full sm:w-64">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
             <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
             <input 
               type="text" 
@@ -206,6 +199,14 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 rounded-xl text-sm font-bold outline-none focus:border-blue-500 shadow-sm" 
             />
           </div>
+          <button 
+            onClick={() => setShowImages(!showImages)}
+            title={showImages ? t.hideImages : t.showImages}
+            className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all shadow-sm shrink-0"
+          >
+            <i className={`fas ${showImages ? 'fa-image' : 'fa-font'} ${showImages ? '' : 'text-blue-500'}`}></i>
+            <span className="hidden sm:inline ml-2">{showImages ? t.hideImages : t.showImages}</span>
+          </button>
         </div>
       </div>
 

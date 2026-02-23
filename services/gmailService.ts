@@ -92,6 +92,26 @@ export const sendReceiptEmail = async (
   const formattedDate = dateObj.toLocaleDateString(lang === 'zh' ? 'zh-HK' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' });
   const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+  const socialHtml = (config?.instagram || config?.facebook) ? `
+    <div style="margin-top: 12px; border-top: 1px dashed #edf2f7; pt: 12px;">
+      <p style="margin: 0 0 8px; color: #a0aec0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Follow Us</p>
+      <div style="display: flex; justify-content: center; gap: 16px;">
+        ${config?.instagram ? `
+          <a href="${config.instagram.startsWith('http') ? config.instagram : `https://instagram.com/${config.instagram.replace('@', '')}`}" style="color: #e1306c; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-block; margin: 0 8px;">
+            <img src="https://cdn-icons-png.flaticon.com/128/174/174855.png" width="12" height="12" style="vertical-align: middle; margin-right: 4px; border: 0;" />
+            <span style="vertical-align: middle;">${config.instagram}</span>
+          </a>
+        ` : ''}
+        ${config?.facebook ? `
+          <a href="${config.facebook.startsWith('http') ? config.facebook : `https://facebook.com/${config.facebook}`}" style="color: #1877f2; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-block; margin: 0 8px;">
+            <img src="https://cdn-icons-png.flaticon.com/128/174/174848.png" width="12" height="12" style="vertical-align: middle; margin-right: 4px; border: 0;" />
+            <span style="vertical-align: middle;">${config.facebook}</span>
+          </a>
+        ` : ''}
+      </div>
+    </div>
+  ` : '';
+
   const body = `
     <div style="background-color: #f7fafc; padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
@@ -157,6 +177,7 @@ export const sendReceiptEmail = async (
           <p style="margin: 8px 0 0; color: #4a5568; font-size: 12px; font-weight: 600;">
             ${lang === 'zh' ? '感謝您的惠顧！' : 'Thank you for your business!'}
           </p>
+          ${socialHtml}
         </div>
       </div>
       <div style="text-align: center; margin-top: 24px;">
