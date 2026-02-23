@@ -53,7 +53,6 @@ const App: React.FC = () => {
   const [receiptConfig, setReceiptConfig] = useState<ReceiptConfig>({ companyName: '', address: '', phone: '', email: '' });
   const [settlementConfig, setSettlementConfig] = useState<SettlementConfig>({ enabled: false, time: '22:00' });
 
-  const [tokenClient, setTokenClient] = useState<any>(null);
   const isInitialMount = useRef(true);
   const isHydrated = useRef(false);
   const t = (TRANSLATIONS as any)[lang];
@@ -267,39 +266,24 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); }, [receiptConfig]);
   useEffect(() => { localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); }, [settlementConfig]);
 
-  const initGsi = () => {
-    if (typeof google !== 'undefined') {
-      try {
-        const client = google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/gmail.send',
-          callback: (tokenResponse: any) => {
-            if (tokenResponse && tokenResponse.access_token) {
-              setGoogleToken(tokenResponse.access_token);
-              setIsLoggedIn(true);
-              setLoginError(null);
-              localStorage.setItem('stall_logged_in', 'true');
-              handleCloudDownload();
-            } else if (tokenResponse.error) {
-              setLoginError(tokenResponse.error_description || tokenResponse.error);
-            }
-          },
-          error_callback: (err: any) => {
-            setLoginError(err.message || "Initialization error");
-          }
-        });
-        setTokenClient(client);
-      } catch (err) { 
-        console.error("GSI Init Error:", err); 
-        setLoginError("Failed to initialize Google Login.");
-      }
-    }
-  };
-
   useEffect(() => {
-    if (document.readyState === 'complete') initGsi();
-    else window.addEventListener('load', initGsi);
-    return () => window.removeEventListener('load', initGsi);
+    const handleMessage = (event: MessageEvent) => {
+      const origin = event.origin;
+      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) return;
+
+      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
+        const data = event.data.payload;
+        if (data && data.access_token) {
+          setGoogleToken(data.access_token);
+          setIsLoggedIn(true);
+          setLoginError(null);
+          localStorage.setItem('stall_logged_in', 'true');
+          // handleCloudDownload is called by the useEffect below when isLoggedIn changes
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   useEffect(() => {
@@ -308,12 +292,30 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, isOnline, handleCloudDownload]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setLoginError(null);
-    if (tokenClient) {
-      tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-      setLoginError("Login library not ready. Please check your internet connection.");
+    try {
+      const response = await fetch('/api/auth/google/url');
+      if (!response.ok) throw new Error('Failed to get auth URL');
+      const { url } = await response.json();
+      
+      const width = 500;
+      const height = 600;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      
+      const authWindow = window.open(
+        url,
+        'google_oauth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!authWindow) {
+        setLoginError("Popup blocked. Please allow popups for this site.");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setLoginError("Failed to initiate login.");
     }
   };
 
