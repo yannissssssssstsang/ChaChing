@@ -67,7 +67,11 @@ export const TRANSLATIONS = {
     reasonDamaged: 'Damaged Item',
     reasonCustomer: 'Customer Changed Mind',
     reasonMistake: 'Order Mistake',
-    reasonOther: 'Other Reason'
+    reasonOther: 'Other Reason',
+    settlementSkipped: 'No transactions recorded today. Settlement skipped.',
+    settlementSuccess: 'Cloud settlement successful',
+    settlementFailed: 'Cloud settlement failed',
+    settlementOffline: 'Not logged in or offline. Settlement file downloaded locally only.'
   },
   [Language.ZH]: {
     appName: '揸流攤',
@@ -133,7 +137,11 @@ export const TRANSLATIONS = {
     reasonDamaged: '商品損壞',
     reasonCustomer: '顧客改變主意',
     reasonMistake: '下單錯誤',
-    reasonOther: '其他原因'
+    reasonOther: '其他原因',
+    settlementSkipped: '今日暫無交易記錄，無需結算。',
+    settlementSuccess: '雲端結算成功',
+    settlementFailed: '雲端結算失敗',
+    settlementOffline: '未登錄或離線，結算文件僅下載到本地。'
   }
 };
 

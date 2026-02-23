@@ -9,6 +9,7 @@ import RecordsView from './views/RecordsView';
 import SettingsView from './views/SettingsView';
 import LandingView from './views/LandingView';
 import { Product, Language, Transaction, DailyReport, PaymentQRCodes, ProductChangeLog, TelegramConfig, SyncStatus, ReceiptConfig, SettlementConfig, Refund } from './types';
+import { TRANSLATIONS } from './constants';
 import { syncToGoogleDrive, downloadFromGoogleDrive, uploadSettlementToDrive } from './services/googleDriveService';
 import { generateSettlementExcel } from './services/settlementService';
 
@@ -55,6 +56,7 @@ const App: React.FC = () => {
   const [tokenClient, setTokenClient] = useState<any>(null);
   const isInitialMount = useRef(true);
   const isHydrated = useRef(false);
+  const t = (TRANSLATIONS as any)[lang];
 
   useEffect(() => {
     const savedProducts = localStorage.getItem('stall_products');
@@ -78,7 +80,7 @@ const App: React.FC = () => {
     if (savedSettlement) setSettlementConfig(JSON.parse(savedSettlement));
   }, []);
 
-  const handleManualSettle = useCallback(async (options: { skipDownload?: boolean } = {}) => {
+  const handleManualSettle = useCallback(async (options: { skipDownload?: boolean; isAuto?: boolean } = {}) => {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
     
@@ -91,11 +93,19 @@ const App: React.FC = () => {
     });
     
     if (todaysTransactions.length === 0) {
-      const msg = lang === Language.ZH 
-        ? '今日暫無交易記錄，導出文件將只包含表頭。' 
-        : 'No transactions recorded today. Export will contain headers only.';
-      console.warn(msg);
-      // Optional: alert(msg);
+      const msg = t.settlementSkipped;
+      
+      console.log(msg);
+      
+      if (!options.isAuto) {
+        alert(msg);
+      }
+
+      // Still mark as settled for today to prevent repeated auto-triggers
+      const newConfig = { ...settlementConfig, lastSettledDate: todayStr };
+      setSettlementConfig(newConfig);
+      localStorage.setItem('stall_settlement_config', JSON.stringify(newConfig));
+      return;
     }
     
     const { fileName, blob } = generateSettlementExcel(todaysTransactions, products);
@@ -116,7 +126,14 @@ const App: React.FC = () => {
       const result = await uploadSettlementToDrive(fileName, blob);
       if (!result.success) {
         console.error("Cloud settlement upload failed:", result.error);
+        if (!options.isAuto) {
+          alert(`${t.settlementFailed}: ${result.error}`);
+        }
+      } else {
+        console.log(t.settlementSuccess);
       }
+    } else if (!options.isAuto) {
+      alert(t.settlementOffline);
     }
     
     const newConfig = { ...settlementConfig, lastSettledDate: todayStr };
@@ -168,30 +185,42 @@ const App: React.FC = () => {
     });
   }, [products, addLog]);
 
-  // Auto-Settlement Checker
-  useEffect(() => {
-    if (!settlementConfig.enabled) return;
+  // Auto-Settlement Checker - Refactored for reliability
+  const settlementConfigRef = useRef(settlementConfig);
+  const handleManualSettleRef = useRef(handleManualSettle);
+  
+  useEffect(() => { settlementConfigRef.current = settlementConfig; }, [settlementConfig]);
+  useEffect(() => { handleManualSettleRef.current = handleManualSettle; }, [handleManualSettle]);
 
-    const interval = setInterval(() => {
+  useEffect(() => {
+    const checkSettlement = () => {
+      const config = settlementConfigRef.current;
+      if (!config.enabled) return;
+
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
       
       // If already settled today, skip
-      if (settlementConfig.lastSettledDate === todayStr) return;
+      if (config.lastSettledDate === todayStr) return;
 
-      const [targetH, targetM] = settlementConfig.time.split(':').map(Number);
+      const [targetH, targetM] = config.time.split(':').map(Number);
       const currentH = now.getHours();
       const currentM = now.getMinutes();
 
       // Trigger if current time is after/at the target time
       if (currentH > targetH || (currentH === targetH && currentM >= targetM)) {
-        console.log("Automatic Daily Settlement Triggered");
-        handleManualSettle({ skipDownload: true });
+        console.log("Automatic Daily Settlement Triggered at", now.toLocaleTimeString());
+        handleManualSettleRef.current({ skipDownload: true, isAuto: true });
       }
-    }, 60000); // Check every minute
+    };
 
+    // Run immediately on mount
+    checkSettlement();
+
+    // Then check every minute
+    const interval = setInterval(checkSettlement, 60000);
     return () => clearInterval(interval);
-  }, [settlementConfig, handleManualSettle]);
+  }, []); // Stable interval, uses refs for latest state/functions
 
   const handleCloudDownload = useCallback(async () => {
     if (!isLoggedIn || !isOnline) return;
