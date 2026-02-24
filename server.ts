@@ -104,6 +104,43 @@ async function startServer() {
     }
   });
 
+  // Google OAuth Token Refresh
+  app.get("/api/auth/google/refresh", async (req, res) => {
+    const { refresh_token } = req.query;
+    if (!refresh_token) {
+      return res.status(400).json({ error: "No refresh token provided" });
+    }
+
+    const client_id = "950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com";
+    const client_secret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (!client_secret) {
+      return res.status(500).json({ error: "GOOGLE_CLIENT_SECRET not configured" });
+    }
+
+    try {
+      const response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id,
+          client_secret,
+          refresh_token: refresh_token as string,
+          grant_type: "refresh_token",
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        return res.status(401).json(data);
+      }
+      res.json(data);
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");

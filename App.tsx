@@ -28,6 +28,10 @@ const App: React.FC = () => {
     return localStorage.getItem('google_access_token');
   });
 
+  const [refreshToken, setRefreshToken] = useState<string | null>(() => {
+    return localStorage.getItem('google_refresh_token');
+  });
+
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('stall_logged_in') === 'true' || !!localStorage.getItem('google_access_token');
   });
@@ -223,6 +227,42 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []); // Stable interval, uses refs for latest state/functions
 
+  const handleTokenExpiry = useCallback(() => {
+    setGoogleToken(null);
+    setRefreshToken(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('google_access_token');
+    localStorage.removeItem('google_refresh_token');
+    localStorage.removeItem('stall_logged_in');
+    if ((window as any).google_access_token) delete (window as any).google_access_token;
+  }, []);
+
+  const handleRefreshToken = useCallback(async () => {
+    const rt = refreshToken || localStorage.getItem('google_refresh_token');
+    if (!rt) {
+      handleTokenExpiry();
+      return false;
+    }
+
+    try {
+      const resp = await fetch(`/api/auth/google/refresh?refresh_token=${rt}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.access_token) {
+          setGoogleToken(data.access_token);
+          return true;
+        }
+      }
+      // If refresh fails, log out
+      handleTokenExpiry();
+      return false;
+    } catch (e) {
+      console.error("Token refresh failed", e);
+      handleTokenExpiry();
+      return false;
+    }
+  }, [refreshToken, handleTokenExpiry]);
+
   const handleCloudDownload = useCallback(async () => {
     if (!isLoggedIn || !isOnline) return;
     setIsInitialCloudLoading(true);
@@ -244,21 +284,45 @@ const App: React.FC = () => {
         isHydrated.current = true;
         setSyncStatus('synced');
       } else if (result.error === 'UNAUTHORIZED') {
-        handleTokenExpiry();
+        const refreshed = await handleRefreshToken();
+        if (refreshed) {
+          // Retry once after refresh
+          const retryResult = await downloadFromGoogleDrive();
+          if (retryResult.success && retryResult.data) {
+            // ... apply data (same as above)
+            const { products: p, transactions: t, reports: r, settings: s } = retryResult.data;
+            if (p) setProducts(p);
+            if (t) setTransactions(t);
+            if (r) setReports(r);
+            if (s) {
+              if (s.paymentQRCodes) setPaymentQRCodes(s.paymentQRCodes);
+              if (s.telegramConfig) setTelegramConfig(s.telegramConfig);
+              if (s.receiptConfig) setReceiptConfig(s.receiptConfig);
+              if (s.lang) setLang(s.lang as Language);
+              if (s.changeLogs) setChangeLogs(s.changeLogs);
+              if ((s as any).settlementConfig) setSettlementConfig((s as any).settlementConfig);
+            }
+            isHydrated.current = true;
+            setSyncStatus('synced');
+          }
+        }
       }
     } catch (e) {
       console.error("Cloud restoration failed:", e);
     } finally {
       setIsInitialCloudLoading(false);
     }
-  }, [isLoggedIn, isOnline]);
+  }, [isLoggedIn, isOnline, handleRefreshToken]);
 
   useEffect(() => {
     if (googleToken) {
       (window as any).google_access_token = googleToken;
       localStorage.setItem('google_access_token', googleToken);
     }
-  }, [googleToken]);
+    if (refreshToken) {
+      localStorage.setItem('google_refresh_token', refreshToken);
+    }
+  }, [googleToken, refreshToken]);
 
   useEffect(() => { localStorage.setItem('stall_lang', lang); }, [lang]);
   useEffect(() => { localStorage.setItem('stall_products', JSON.stringify(products)); }, [products]);
@@ -279,6 +343,7 @@ const App: React.FC = () => {
         const data = event.data.payload;
         if (data && data.access_token) {
           setGoogleToken(data.access_token);
+          if (data.refresh_token) setRefreshToken(data.refresh_token);
           setIsLoggedIn(true);
           setLoginError(null);
           setIsLoggingIn(false);
@@ -335,14 +400,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleTokenExpiry = useCallback(() => {
-    setGoogleToken(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem('google_access_token');
-    localStorage.removeItem('stall_logged_in');
-    if ((window as any).google_access_token) delete (window as any).google_access_token;
-  }, []);
-
   const handleLogout = useCallback(() => {
     setIsLoggedIn(false);
     setGoogleToken(null);
@@ -375,13 +432,30 @@ const App: React.FC = () => {
         setSyncStatus('synced');
         localStorage.setItem('stall_last_sync', now);
       } else {
-        if (result.error === 'UNAUTHORIZED') handleTokenExpiry();
+        if (result.error === 'UNAUTHORIZED') {
+          const refreshed = await handleRefreshToken();
+          if (refreshed) {
+            // Retry sync once
+            const retryResult = await syncToGoogleDrive({
+              products, transactions, reports,
+              settings: { lang, telegramConfig, paymentQRCodes, receiptConfig, changeLogs, settlementConfig }
+            });
+            if (retryResult.success) {
+              const now = new Date().toISOString();
+              setLastSyncTime(now);
+              setSyncStatus('synced');
+              localStorage.setItem('stall_last_sync', now);
+            } else {
+              setSyncStatus('error');
+            }
+          }
+        }
         else setSyncStatus('error');
       }
     } catch (e) {
       setSyncStatus('error');
     }
-  }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, googleToken, handleTokenExpiry]);
+  }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, googleToken, handleRefreshToken]);
 
   useEffect(() => {
     if (isInitialMount.current || !isHydrated.current) {
