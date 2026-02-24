@@ -18,40 +18,6 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
-  // Google OAuth URL generation
-  app.get("/api/auth/google/url", (req, res) => {
-    console.log("Generating Google OAuth URL...");
-    const client_id = "950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com";
-    
-    // Improved URL detection for proxy environments like AI Studio
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const host = req.get('host');
-    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
-    
-    const redirect_uri = `${appUrl.replace(/\/$/, '')}/auth/callback`;
-    console.log(`Using redirect_uri: ${redirect_uri}`);
-    
-    const scope = [
-      'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/drive.readonly',
-      'https://www.googleapis.com/auth/gmail.send',
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email'
-    ].join(' ');
-
-    const params = new URLSearchParams({
-      client_id,
-      redirect_uri,
-      response_type: 'code',
-      scope,
-      access_type: 'offline',
-      prompt: 'consent'
-    });
-
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    res.json({ url });
-  });
-
   // Google OAuth Callback
   app.get("/auth/callback", async (req, res) => {
     const { code } = req.query;

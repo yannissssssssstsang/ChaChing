@@ -16,6 +16,13 @@ import { generateSettlementExcel } from './services/settlementService';
 declare const google: any;
 
 const GOOGLE_CLIENT_ID = '950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com';
+const GOOGLE_SCOPES = [
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/drive.readonly',
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/userinfo.email'
+].join(' ');
 
 const INITIAL_PRODUCTS: Product[] = [
   { id: '1', name: 'Artisan Coffee', price: 45, cost: 15, stock: 50, threshold: 5, category: 'Beverage', image: 'https://picsum.photos/seed/coffee/200' },
@@ -58,10 +65,24 @@ const App: React.FC = () => {
   const [telegramConfig, setTelegramConfig] = useState<TelegramConfig>({ botToken: '', chatId: '', alertType: 'both' });
   const [receiptConfig, setReceiptConfig] = useState<ReceiptConfig>({ companyName: '', address: '', phone: '', email: '', instagram: '', facebook: '' });
   const [settlementConfig, setSettlementConfig] = useState<SettlementConfig>({ enabled: false, time: '22:00' });
+  const [authUrl, setAuthUrl] = useState<string>('');
 
   const isInitialMount = useRef(true);
   const isHydrated = useRef(false);
   const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
+
+  useEffect(() => {
+    const redirect_uri = `${window.location.origin}/auth/callback`;
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri,
+      response_type: 'code',
+      scope: GOOGLE_SCOPES,
+      access_type: 'offline',
+      prompt: 'consent'
+    });
+    setAuthUrl(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+  }, []);
 
   useEffect(() => {
     const savedProducts = localStorage.getItem('stall_products');
@@ -365,6 +386,7 @@ const App: React.FC = () => {
     setLoginError(null);
     setIsLoggingIn(true);
     try {
+      if (!authUrl) throw new Error('Auth URL not initialized');
       
       const width = 500;
       const height = 600;
@@ -372,7 +394,7 @@ const App: React.FC = () => {
       const top = window.screenY + (window.outerHeight - height) / 2;
       
       const authWindow = window.open(
-        url,
+        authUrl,
         'google_oauth',
         `width=${width},height=${height},left=${left},top=${top}`
       );
