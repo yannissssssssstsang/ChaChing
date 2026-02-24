@@ -289,7 +289,6 @@ const App: React.FC = () => {
           // Retry once after refresh
           const retryResult = await downloadFromGoogleDrive();
           if (retryResult.success && retryResult.data) {
-            // ... apply data (same as above)
             const { products: p, transactions: t, reports: r, settings: s } = retryResult.data;
             if (p) setProducts(p);
             if (t) setTransactions(t);
