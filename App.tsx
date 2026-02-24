@@ -365,9 +365,6 @@ const App: React.FC = () => {
     setLoginError(null);
     setIsLoggingIn(true);
     try {
-      const response = await fetch('/api/auth/google/url');
-      if (!response.ok) throw new Error('Failed to get auth URL');
-      const { url } = await response.json();
       
       const width = 500;
       const height = 600;
