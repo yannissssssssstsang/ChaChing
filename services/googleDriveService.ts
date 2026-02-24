@@ -223,6 +223,7 @@ export const downloadFromGoogleDrive = async (): Promise<{ success: boolean; dat
     };
   } catch (error: any) {
     console.error("Cloud Retrieval Error:", error);
+    if (error.message === 'UNAUTHORIZED') return { success: false, error: 'UNAUTHORIZED' };
     return { success: false, error: error.message };
   }
 };

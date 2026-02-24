@@ -288,6 +288,24 @@ const App: React.FC = () => {
       }
     };
     window.addEventListener('message', handleMessage);
+
+    // Catch token from URL hash (Implicit Flow)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get('access_token');
+      if (accessToken) {
+        setGoogleToken(accessToken);
+        setIsLoggedIn(true);
+        setLoginError(null);
+        setIsLoggingIn(false);
+        localStorage.setItem('stall_logged_in', 'true');
+        localStorage.setItem('google_access_token', accessToken);
+        // Clean up the hash to avoid confusion with HashRouter
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
@@ -297,42 +315,20 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, isOnline, handleCloudDownload]);
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     setLoginError(null);
     setIsLoggingIn(true);
-    try {
-      const response = await fetch('/api/auth/google/url');
-      if (!response.ok) throw new Error('Failed to get auth URL');
-      const { url } = await response.json();
-      
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      const authWindow = window.open(
-        url,
-        'google_oauth',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      if (!authWindow) {
-        setLoginError("Popup blocked. Please allow popups for this site.");
-        setIsLoggingIn(false);
-      } else {
-        // Monitor window closure to reset loading state if user closes it without finishing
-        const timer = setInterval(() => {
-          if (authWindow.closed) {
-            clearInterval(timer);
-            setIsLoggingIn(false);
-          }
-        }, 1000);
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      setLoginError("Failed to initiate login. Please check your connection.");
-      setIsLoggingIn(false);
-    }
+    
+    const clientId = GOOGLE_CLIENT_ID;
+    const redirectUri = window.location.origin;
+    const scopes = [
+      'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/userinfo.profile'
+    ].join(' ');
+    
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&include_granted_scopes=true`;
+    
+    window.location.href = authUrl;
   };
 
   const handleTokenExpiry = useCallback(() => {
