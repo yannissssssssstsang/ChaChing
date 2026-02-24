@@ -13,13 +13,30 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Trust proxy for correct protocol/host detection in AI Studio
+  app.set('trust proxy', true);
+
   // API routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
+  // Diagnostic route
+  app.get("/api/debug/auth", (req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
+    res.json({
+      protocol,
+      host,
+      appUrl,
+      redirect_uri: `${appUrl.replace(/\/$/, '')}/auth/callback`,
+      headers: req.headers
+    });
+  });
+
   // Google OAuth Callback
-  app.get("/auth/callback", async (req, res) => {
+  app.get(["/auth/callback", "/auth/callback/"], async (req, res) => {
     const { code } = req.query;
     if (!code) {
       return res.status(400).send("No code provided");
@@ -28,10 +45,8 @@ async function startServer() {
     const client_id = "950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com";
     const client_secret = process.env.GOOGLE_CLIENT_SECRET;
     
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const host = req.get('host');
-    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
-    
+    // Use trust proxy values
+    const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
     const redirect_uri = `${appUrl.replace(/\/$/, '')}/auth/callback`;
 
     if (!client_secret) {
