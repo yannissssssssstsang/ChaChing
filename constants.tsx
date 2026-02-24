@@ -79,7 +79,7 @@ export const TRANSLATIONS = {
   },
   [Language.ZH]: {
     appName: '揸流攤',
-    ordering: '點餐系統',
+    ordering: '下單系統',
     inventory: '庫庫管理',
     analytics: '數據分析',
     records: '銷售記錄',
