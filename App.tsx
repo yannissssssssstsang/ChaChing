@@ -392,9 +392,9 @@ const App: React.FC = () => {
           }
         }, 1000);
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setLoginError("Failed to initiate login. Please check your connection.");
+    } catch (err: any) {
+      console.error("Login error details:", err);
+      setLoginError(`Failed to initiate login: ${err.message || 'Unknown error'}. Please check your connection.`);
       setIsLoggingIn(false);
     }
   };

@@ -20,9 +20,17 @@ async function startServer() {
 
   // Google OAuth URL generation
   app.get("/api/auth/google/url", (req, res) => {
+    console.log("Generating Google OAuth URL...");
     const client_id = "950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com";
-    const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    
+    // Improved URL detection for proxy environments like AI Studio
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
+    
     const redirect_uri = `${appUrl.replace(/\/$/, '')}/auth/callback`;
+    console.log(`Using redirect_uri: ${redirect_uri}`);
+    
     const scope = [
       'https://www.googleapis.com/auth/drive.file',
       'https://www.googleapis.com/auth/drive.readonly',
@@ -53,7 +61,11 @@ async function startServer() {
 
     const client_id = "950489680613-dnvqv44q1aml8tdakijnp0r0hr5gqqt0.apps.googleusercontent.com";
     const client_secret = process.env.GOOGLE_CLIENT_SECRET;
-    const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
+    
     const redirect_uri = `${appUrl.replace(/\/$/, '')}/auth/callback`;
 
     if (!client_secret) {
