@@ -53,9 +53,19 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
 
   // Comprehensive Product Mix Calculation
   const productMixData = useMemo(() => {
-    const summary: Record<string, { label: string; units: number; revenue: number; refundedUnits: number }> = {};
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    const summary: Record<string, { 
+      label: string; 
+      today: { units: number; revenue: number; refundedUnits: number };
+      allTime: { units: number; revenue: number; refundedUnits: number };
+    }> = {};
 
-    filteredTransactions.forEach(tx => {
+    transactions.forEach(tx => {
+      const txTime = new Date(tx.timestamp).getTime();
+      const isToday = txTime >= startOfToday;
+
       tx.items.forEach(item => {
         // Look up the current product info to ensure category updates are reflected
         const currentProduct = products.find(p => p.id === item.id);
@@ -66,7 +76,11 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         const label = summaryMode === 'item' ? activeName : activeCategory;
 
         if (!summary[key]) {
-          summary[key] = { label, units: 0, revenue: 0, refundedUnits: 0 };
+          summary[key] = { 
+            label, 
+            today: { units: 0, revenue: 0, refundedUnits: 0 },
+            allTime: { units: 0, revenue: 0, refundedUnits: 0 }
+          };
         }
 
         const refundedQty = (tx.refunds || [])
@@ -74,18 +88,27 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
           .reduce((acc, r) => acc + r.quantity, 0);
         
         const netQty = item.quantity - refundedQty;
+        const price = item.discountedPrice || item.price;
+        const revenue = price * netQty;
         
-        // Accumulate gross and refunds separately for display
-        summary[key].units += netQty;
-        summary[key].refundedUnits += refundedQty;
-        summary[key].revenue += (item.price * netQty);
+        // All Time
+        summary[key].allTime.units += netQty;
+        summary[key].allTime.refundedUnits += refundedQty;
+        summary[key].allTime.revenue += revenue;
+
+        // Today
+        if (isToday) {
+          summary[key].today.units += netQty;
+          summary[key].today.refundedUnits += refundedQty;
+          summary[key].today.revenue += revenue;
+        }
       });
     });
 
     return Object.values(summary)
-      .sort((a, b) => b.units - a.units)
+      .sort((a, b) => b.allTime.units - a.allTime.units)
       .slice(0, 8); // Top 8 for the summary list
-  }, [filteredTransactions, summaryMode, lang, products]);
+  }, [transactions, summaryMode, lang, products]);
 
   const locationStats = useMemo(() => {
     const stats: Record<string, { lat: number; lng: number; revenue: number; count: number; name: string }> = {};
@@ -281,26 +304,40 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {productMixData.length > 0 ? productMixData.map((item, idx) => {
-            const maxUnits = Math.max(...productMixData.map(d => d.units), 1);
-            const progress = (item.units / maxUnits) * 100;
             return (
               <div key={idx} className="space-y-4 p-5 bg-slate-50 rounded-[32px] border border-slate-100 transition-all hover:border-blue-200 group flex flex-col justify-between">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{item.label}</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-slate-800">{item.units}</span>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty</span>
+                  <span className="text-[11px] font-black text-slate-800 uppercase tracking-[0.1em] block mb-3 border-b border-slate-200 pb-2">{item.label}</span>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Today</p>
+                      <div>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-xl font-black text-slate-800">{item.today.units}</span>
+                          <span className="text-[8px] font-black text-slate-400 uppercase">Qty</span>
+                        </div>
+                        <p className="text-sm font-black text-blue-600">${item.today.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+                        {item.today.refundedUnits > 0 && (
+                          <p className="text-[8px] font-black text-red-500 italic">(-{item.today.refundedUnits} ref)</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 border-l border-slate-200 pl-4">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">All Time</p>
+                      <div>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-xl font-black text-slate-800">{item.allTime.units}</span>
+                          <span className="text-[8px] font-black text-slate-400 uppercase">Qty</span>
+                        </div>
+                        <p className="text-sm font-black text-blue-600">${item.allTime.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+                        {item.allTime.refundedUnits > 0 && (
+                          <p className="text-[8px] font-black text-red-500 italic">(-{item.allTime.refundedUnits} ref)</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  {item.refundedUnits > 0 && (
-                    <p className="text-[9px] font-black text-red-500 italic">
-                      (-{item.refundedUnits} refunded)
-                    </p>
-                  )}
-                </div>
-                
-                <div className="pt-4 border-t border-slate-200/50">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Revenue</span>
-                  <span className="text-xl font-black text-blue-600">${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 </div>
               </div>
             );
