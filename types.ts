@@ -37,6 +37,7 @@ export interface ProductChangeLog {
 
 export interface CartItem extends Product {
   quantity: number;
+  discountedPrice?: number;
 }
 
 export interface Refund {
@@ -56,6 +57,10 @@ export interface Transaction {
   timestamp: string;
   items: CartItem[];
   total: number;
+  originalTotal: number;
+  discountAmount: number;
+  discountType?: 'percentage' | 'rounding';
+  discountValue?: number;
   paymentMethod: string;
   profit: number;
   customerEmail?: string;

@@ -35,6 +35,11 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
   // Cash calculator state
   const [receivedBills, setReceivedBills] = useState<number[]>([]);
   const totalReceived = useMemo(() => receivedBills.reduce((a, b) => a + b, 0), [receivedBills]);
+
+  // Discount state
+  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'rounding'>('none');
+  const [discountValue, setDiscountValue] = useState<number>(0);
+  const [discountTargetIds, setDiscountTargetIds] = useState<string[]>([]); // Empty means all
   
   const [showImages, setShowImages] = useState(() => {
     const saved = localStorage.getItem('stall_show_images');
@@ -105,12 +110,57 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
       if (existing && existing.quantity > 1) {
         return prev.map(item => item.id === productId ? { ...item, quantity: item.quantity - 1 } : item);
       }
-      return prev.filter(item => item.id !== productId);
+      const newCart = prev.filter(item => item.id !== productId);
+      // Remove from discount targets if item is removed from cart
+      setDiscountTargetIds(targets => targets.filter(id => id !== productId));
+      return newCart;
     });
   };
 
-  const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const cartProfit = cart.reduce((acc, item) => acc + ((item.price - item.cost) * item.quantity), 0);
+  const discountedCart = useMemo(() => {
+    if (discountType === 'none') return cart.map(item => ({ ...item, discountedPrice: item.price }));
+
+    const targetItems = discountTargetIds.length === 0 
+      ? cart 
+      : cart.filter(item => discountTargetIds.includes(item.id));
+    
+    if (targetItems.length === 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
+
+    if (discountType === 'percentage') {
+      const multiplier = (100 - discountValue) / 100;
+      return cart.map(item => {
+        if (discountTargetIds.length === 0 || discountTargetIds.includes(item.id)) {
+          return { ...item, discountedPrice: item.price * multiplier };
+        }
+        return { ...item, discountedPrice: item.price };
+      });
+    }
+
+    if (discountType === 'rounding') {
+      const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      const roundedTotal = Math.floor(targetTotal / discountValue) * discountValue;
+      const diff = targetTotal - roundedTotal;
+      
+      if (diff <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
+
+      const totalQuantity = targetItems.reduce((acc, item) => acc + item.quantity, 0);
+      const discountPerUnit = diff / totalQuantity;
+
+      return cart.map(item => {
+        if (discountTargetIds.length === 0 || discountTargetIds.includes(item.id)) {
+          return { ...item, discountedPrice: Math.max(0, item.price - discountPerUnit) };
+        }
+        return { ...item, discountedPrice: item.price };
+      });
+    }
+
+    return cart.map(item => ({ ...item, discountedPrice: item.price }));
+  }, [cart, discountType, discountValue, discountTargetIds]);
+
+  const cartTotal = discountedCart.reduce((acc, item) => acc + ((item.discountedPrice || item.price) * item.quantity), 0);
+  const originalTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const discountAmount = originalTotal - cartTotal;
+  const cartProfit = discountedCart.reduce((acc, item) => acc + (((item.discountedPrice || item.price) - item.cost) * item.quantity), 0);
 
   const changeDue = useMemo(() => {
     return Math.max(0, totalReceived - cartTotal);
@@ -123,8 +173,12 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     const transaction: Transaction = {
       id: Math.random().toString(36).substr(2, 9),
       timestamp: new Date().toISOString(),
-      items: [...cart],
+      items: [...discountedCart],
       total: cartTotal,
+      originalTotal: originalTotal,
+      discountAmount: discountAmount,
+      discountType: discountType !== 'none' ? discountType : undefined,
+      discountValue: discountType !== 'none' ? discountValue : undefined,
       paymentMethod: selectedPayment!,
       profit: cartProfit,
       customerEmail: (emailSent && customerEmail) ? customerEmail : undefined,
@@ -168,6 +222,9 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     setApiError(null);
     setCurrentCoords(null);
     setReceivedBills([]);
+    setDiscountType('none');
+    setDiscountValue(0);
+    setDiscountTargetIds([]);
   };
 
   const groupedProducts = useMemo(() => {
@@ -300,9 +357,114 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center px-4 pt-4 border-t border-slate-100">
-                   <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.total}</span>
-                   <span className="text-3xl font-black text-blue-600">${cartTotal.toFixed(1)}</span>
+                <div className="flex flex-col px-4 pt-4 border-t border-slate-100 space-y-2">
+                   {discountAmount > 0 && (
+                     <div className="flex justify-between items-center">
+                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t.originalTotal}</span>
+                       <span className="text-sm font-black text-slate-300 line-through">${originalTotal.toFixed(1)}</span>
+                     </div>
+                   )}
+                   <div className="flex justify-between items-center">
+                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.total}</span>
+                     <span className="text-3xl font-black text-blue-600">${cartTotal.toFixed(1)}</span>
+                   </div>
+                   {discountAmount > 0 && (
+                     <div className="flex justify-between items-center">
+                       <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{t.discountAmount}</span>
+                       <span className="text-sm font-black text-emerald-500">-${discountAmount.toFixed(1)}</span>
+                     </div>
+                   )}
+                </div>
+
+                {/* Discount Section */}
+                <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.discount}</span>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          const newType = discountType === 'percentage' ? 'none' : 'percentage';
+                          setDiscountType(newType);
+                          if (newType === 'percentage') setDiscountValue(10);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                      >
+                        {t.percentage}
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const newType = discountType === 'rounding' ? 'none' : 'rounding';
+                          setDiscountType(newType);
+                          if (newType === 'rounding') setDiscountValue(10);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'rounding' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                      >
+                        {t.rounding}
+                      </button>
+                    </div>
+                  </div>
+
+                  {discountType !== 'none' && (
+                    <div className="space-y-4 animate-scale-in">
+                      {discountType === 'percentage' ? (
+                        <div className="flex items-center gap-4">
+                          <input 
+                            type="range" min="0" max="100" step="5"
+                            value={discountValue}
+                            onChange={(e) => setDiscountValue(parseInt(e.target.value))}
+                            className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                          />
+                          <span className="text-sm font-black text-blue-600 w-12 text-right">{discountValue}%</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                          <button 
+                            onClick={() => setDiscountValue(10)}
+                            className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountValue === 10 ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                          >
+                            {t.roundTo10}
+                          </button>
+                          <button 
+                            onClick={() => setDiscountValue(100)}
+                            className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountValue === 100 ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                          >
+                            {t.roundTo100}
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col gap-2">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.applyToSelected}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <button 
+                            onClick={() => setDiscountTargetIds([])}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all ${discountTargetIds.length === 0 ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                          >
+                            {t.applyToAll}
+                          </button>
+                          {cart.map(item => (
+                            <button 
+                              key={item.id}
+                              onClick={() => {
+                                setDiscountTargetIds(prev => {
+                                  if (prev.length === 0) {
+                                    // If currently "All", select only this item
+                                    return [item.id];
+                                  }
+                                  return prev.includes(item.id) 
+                                    ? prev.filter(id => id !== item.id) 
+                                    : [...prev, item.id]
+                                });
+                              }}
+                              className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all ${discountTargetIds.includes(item.id) ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-white text-slate-300 border border-slate-100'}`}
+                            >
+                              {item.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

@@ -252,6 +252,12 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
               </div>
 
               <div className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-4 space-y-2">
+                {tx.discountAmount > 0 && (
+                  <div className="flex justify-between items-center text-[9px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 mb-2">
+                    <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : `${t.rounding} ${tx.discountValue}`})</span>
+                    <span>-${tx.discountAmount.toFixed(1)}</span>
+                  </div>
+                )}
                 {tx.items.map((item, idx) => {
                   const refundedQty = (tx.refunds || [])
                     .filter(r => r.itemId === item.id)
@@ -268,7 +274,10 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                         {refundedQty > 0 && <span className="text-[8px] text-red-400 font-black italic">(-{refundedQty} {t.refunded})</span>}
                       </div>
                       <span className={`font-black ${remainingQty <= 0 ? 'text-slate-300 line-through' : 'text-slate-400'}`}>
-                        ${(item.price * item.quantity).toFixed(1)}
+                        ${((item.discountedPrice || item.price) * item.quantity).toFixed(1)}
+                        {item.discountedPrice && item.discountedPrice < item.price && (
+                          <span className="ml-1 text-[8px] line-through opacity-50">${(item.price * item.quantity).toFixed(1)}</span>
+                        )}
                       </span>
                     </div>
                   );

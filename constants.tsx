@@ -75,7 +75,18 @@ export const TRANSLATIONS = {
     showImages: 'Show Images',
     hideImages: 'Hide Images',
     instagram: 'Instagram Name',
-    facebook: 'Facebook Name'
+    facebook: 'Facebook Name',
+    discount: 'Discount',
+    applyDiscount: 'Apply Discount',
+    discountType: 'Discount Type',
+    percentage: 'Percentage (%)',
+    rounding: 'Rounding Down',
+    roundTo10: 'Nearest 10',
+    roundTo100: 'Nearest 100',
+    applyToAll: 'Apply to All Items',
+    applyToSelected: 'Apply to Selected Items',
+    originalTotal: 'Original Total',
+    discountAmount: 'Discount Amount',
   },
   [Language.ZH]: {
     appName: '揸流攤',
@@ -149,7 +160,18 @@ export const TRANSLATIONS = {
     showImages: '顯示圖片',
     hideImages: '隱藏圖片',
     instagram: 'Instagram 名稱',
-    facebook: 'Facebook 名稱'
+    facebook: 'Facebook 名稱',
+    discount: '折扣',
+    applyDiscount: '應用折扣',
+    discountType: '折扣類型',
+    percentage: '百分比 (%)',
+    rounding: '捨入 (向下取整)',
+    roundTo10: '捨入到 10',
+    roundTo100: '捨入到 100',
+    applyToAll: '應用於所有項目',
+    applyToSelected: '應用於所選項目',
+    originalTotal: '原價總計',
+    discountAmount: '折扣金額',
   }
 };
 

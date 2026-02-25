@@ -73,14 +73,32 @@ export const sendReceiptEmail = async (
   
   const totalQuantity = transaction.items.reduce((acc, item) => acc + item.quantity, 0);
 
-  const itemsHtml = transaction.items.map(item => `
-    <tr style="border-bottom: 1px solid #edf2f7;">
-      <td style="padding: 12px 0; color: #1a202c; font-size: 14px; font-weight: 500;">${item.name}</td>
-      <td style="padding: 12px 0; color: #4a5568; font-size: 14px; text-align: center;">$${item.price.toFixed(1)}</td>
-      <td style="padding: 12px 0; color: #4a5568; font-size: 14px; text-align: center;">${item.quantity}</td>
-      <td style="padding: 12px 0; color: #1a202c; font-size: 14px; font-weight: 700; text-align: right;">$${(item.price * item.quantity).toFixed(1)}</td>
+  const itemsHtml = transaction.items.map(item => {
+    const price = item.discountedPrice || item.price;
+    const isDiscounted = item.discountedPrice && item.discountedPrice < item.price;
+    return `
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #1a202c; font-size: 14px; font-weight: 500;">${item.name}</td>
+        <td style="padding: 12px 0; color: #4a5568; font-size: 14px; text-align: center;">
+          $${price.toFixed(1)}
+          ${isDiscounted ? `<br/><span style="font-size: 10px; text-decoration: line-through; opacity: 0.5;">$${item.price.toFixed(1)}</span>` : ''}
+        </td>
+        <td style="padding: 12px 0; color: #4a5568; font-size: 14px; text-align: center;">${item.quantity}</td>
+        <td style="padding: 12px 0; color: #1a202c; font-size: 14px; font-weight: 700; text-align: right;">$${(price * item.quantity).toFixed(1)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const discountRowsHtml = transaction.discountAmount > 0 ? `
+    <tr>
+      <td colspan="3" style="padding: 8px 0; color: #a0aec0; font-size: 12px; font-weight: 700; text-align: right; text-transform: uppercase;">Subtotal</td>
+      <td style="padding: 8px 0; color: #a0aec0; font-size: 12px; font-weight: 700; text-align: right; text-decoration: line-through;">$${transaction.originalTotal.toFixed(1)}</td>
     </tr>
-  `).join('');
+    <tr>
+      <td colspan="3" style="padding: 8px 0; color: #38a169; font-size: 12px; font-weight: 700; text-align: right; text-transform: uppercase;">Discount (${transaction.discountType === 'percentage' ? `${transaction.discountValue}%` : 'Rounding'})</td>
+      <td style="padding: 8px 0; color: #38a169; font-size: 12px; font-weight: 700; text-align: right;">-$${transaction.discountAmount.toFixed(1)}</td>
+    </tr>
+  ` : '';
 
   const logoHtml = config?.logo ? `
     <div style="margin-bottom: 16px;">
@@ -155,7 +173,10 @@ export const sendReceiptEmail = async (
                 <th style="text-align: right; padding-bottom: 12px; color: #a0aec0; font-size: 10px; font-weight: 700; text-transform: uppercase;">Total</th>
               </tr>
             </thead>
-            <tbody>${itemsHtml}</tbody>
+            <tbody>
+              ${itemsHtml}
+              ${discountRowsHtml}
+            </tbody>
           </table>
         </div>
         <div style="padding: 32px; background-color: #2563eb; color: #ffffff;">
