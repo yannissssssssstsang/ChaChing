@@ -14,19 +14,23 @@ export const generateSettlementExcel = (transactions: Transaction[], products: P
   const fileName = `Settlement_${dateStr}_${timeStr}.xlsx`;
 
   // 1. All daily transactions records
-  const transHeaders = ["ID", "Timestamp", "Items", "Payment Method", "Total", "Refund Amount", "Net Total", "Profit", "Refund Reasons", "Customer Email"];
+  const transHeaders = ["ID", "Timestamp", "Items", "Payment Method", "Original Total", "Discount Type", "Discount Amount", "Net Total (Paid)", "Refund Amount", "Final Total", "Profit", "Refund Reasons", "Customer Email"];
   const transData = transactions.map(tx => {
     const refundTotal = (tx.refunds || []).reduce((acc, r) => acc + r.amount, 0);
     const refundReasons = (tx.refunds || []).map(r => `${r.itemName}: ${r.reason}`).join('; ');
+    const discountInfo = tx.discountType ? `${tx.discountType}${tx.discountIteration && tx.discountIteration > 1 ? ` x${tx.discountIteration}` : ''} (${tx.discountValue}${tx.discountType === 'percentage' ? '%' : ''})` : 'None';
     
     return {
       ID: tx.id,
       Timestamp: new Date(tx.timestamp).toLocaleString(),
       Items: tx.items.map(i => `${i.name} (x${i.quantity})`).join(', '),
       'Payment Method': tx.paymentMethod,
-      Total: tx.total,
+      'Original Total': tx.originalTotal || tx.total,
+      'Discount Type': discountInfo,
+      'Discount Amount': tx.discountAmount || 0,
+      'Net Total (Paid)': tx.total,
       'Refund Amount': refundTotal,
-      'Net Total': tx.total - refundTotal,
+      'Final Total': tx.total - refundTotal,
       Profit: tx.profit - (tx.refunds || []).reduce((acc, r) => acc + r.profitImpact, 0),
       'Refund Reasons': refundReasons || 'None',
       'Customer Email': tx.customerEmail || 'N/A'
@@ -59,10 +63,11 @@ export const generateSettlementExcel = (transactions: Transaction[], products: P
       
       // Net units sold: Gross - All Refunds
       const netQty = item.quantity - totalRefundedQty;
+      const price = item.discountedPrice || item.price;
 
-      categorySummary[cat].revenue += item.price * netQty;
+      categorySummary[cat].revenue += price * netQty;
       categorySummary[cat].units += netQty;
-      categorySummary[cat].profit += (item.price - item.cost) * netQty;
+      categorySummary[cat].profit += (price - item.cost) * netQty;
       categorySummary[cat].damaged += damagedQty;
     });
   });
@@ -80,6 +85,8 @@ export const generateSettlementExcel = (transactions: Transaction[], products: P
   const wsMix = XLSX.utils.json_to_sheet(mixData, { header: mixHeaders });
 
   // 3. Financial Summary
+  const totalOriginalRevenue = transactions.reduce((acc, tx) => acc + (tx.originalTotal || tx.total), 0);
+  const totalDiscountAmount = transactions.reduce((acc, tx) => acc + (tx.discountAmount || 0), 0);
   const totalGrossRevenue = transactions.reduce((acc, tx) => acc + tx.total, 0);
   const totalRefundAmount = transactions.reduce((acc, tx) => acc + (tx.refunds || []).reduce((ra, r) => ra + r.amount, 0), 0);
   const totalNetRevenue = totalGrossRevenue - totalRefundAmount;
@@ -95,7 +102,9 @@ export const generateSettlementExcel = (transactions: Transaction[], products: P
     { Label: 'Settlement Date', Value: dateStr },
     { Label: 'Settlement Time', Value: now.toLocaleTimeString() },
     { Label: 'Total Transactions', Value: transactions.length },
-    { Label: 'Gross Revenue', Value: totalGrossRevenue },
+    { Label: 'Original Revenue (Pre-Discount)', Value: totalOriginalRevenue },
+    { Label: 'Total Discounts Given', Value: totalDiscountAmount },
+    { Label: 'Gross Revenue (Post-Discount)', Value: totalGrossRevenue },
     { Label: 'Total Refunds', Value: totalRefundAmount },
     { Label: 'Net Revenue', Value: totalNetRevenue },
     { Label: 'Net Profit', Value: totalNetProfit },

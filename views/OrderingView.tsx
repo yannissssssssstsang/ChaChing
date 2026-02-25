@@ -411,17 +411,25 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                   {discountType !== 'none' && (
                     <div className="space-y-4 animate-scale-in">
                       {discountType === 'percentage' ? (
-                        <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm animate-scale-in">
-                          <input 
-                            type="number" 
-                            min="0" 
-                            max="100"
-                            value={discountValue}
-                            onChange={(e) => setDiscountValue(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
-                            className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
-                            placeholder="0"
-                          />
-                          <span className="text-slate-400 font-bold">%</span>
+                        <div className="flex items-center gap-3 animate-scale-in">
+                          <button 
+                            onClick={() => setDiscountValue(prev => Math.max(0, prev - 5))}
+                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                          >
+                            <i className="fas fa-minus"></i>
+                          </button>
+                          
+                          <div className="flex-1 flex items-center justify-center gap-1 bg-white h-12 rounded-2xl border border-slate-200 shadow-sm">
+                            <span className="font-black text-slate-800 text-lg">{discountValue}</span>
+                            <span className="text-slate-400 font-bold text-xs">%</span>
+                          </div>
+
+                          <button 
+                            onClick={() => setDiscountValue(prev => Math.min(100, prev + 5))}
+                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                          >
+                            <i className="fas fa-plus"></i>
+                          </button>
                         </div>
                       ) : (
                         <div className="space-y-4">

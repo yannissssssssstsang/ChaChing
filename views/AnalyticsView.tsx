@@ -284,27 +284,23 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
             const maxUnits = Math.max(...productMixData.map(d => d.units), 1);
             const progress = (item.units / maxUnits) * 100;
             return (
-              <div key={idx} className="space-y-3 p-4 bg-slate-50 rounded-[24px] border border-slate-100 transition-all hover:border-blue-200 group">
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black text-slate-800 uppercase tracking-tight truncate max-w-[70%]">{item.label}</span>
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-black text-blue-600">{item.units} Qty</span>
-                    {item.refundedUnits > 0 && (
-                      <span className="text-[8px] font-black text-red-500 italic mt-0.5 whitespace-nowrap">
-                        (-{item.refundedUnits} refunded)
-                      </span>
-                    )}
+              <div key={idx} className="space-y-4 p-5 bg-slate-50 rounded-[32px] border border-slate-100 transition-all hover:border-blue-200 group flex flex-col justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{item.label}</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-slate-800">{item.units}</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty</span>
                   </div>
+                  {item.refundedUnits > 0 && (
+                    <p className="text-[9px] font-black text-red-500 italic">
+                      (-{item.refundedUnits} refunded)
+                    </p>
+                  )}
                 </div>
-                <div className="h-2 w-full bg-white rounded-full overflow-hidden border border-slate-200">
-                  <div 
-                    className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out group-hover:bg-blue-600"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between items-center opacity-60">
-                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Revenue</span>
-                  <span className="text-[10px] font-bold text-slate-700">${item.revenue.toFixed(1)}</span>
+                
+                <div className="pt-4 border-t border-slate-200/50">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Revenue</span>
+                  <span className="text-xl font-black text-blue-600">${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 </div>
               </div>
             );
