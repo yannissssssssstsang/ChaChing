@@ -236,9 +236,16 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`text-lg font-black ${isFullyRefunded ? 'text-slate-400 line-through' : 'text-blue-600'}`}>
-                    ${effectiveTotal.toFixed(1)}
-                  </p>
+                  <div className="flex flex-col items-end">
+                    {tx.discountAmount > 0 && !isFullyRefunded && (
+                      <span className="text-[10px] font-black text-slate-300 line-through tracking-tight">
+                        ${tx.originalTotal.toFixed(1)}
+                      </span>
+                    )}
+                    <p className={`text-lg font-black ${isFullyRefunded ? 'text-slate-400 line-through' : 'text-blue-600'}`}>
+                      ${effectiveTotal.toFixed(1)}
+                    </p>
+                  </div>
                   <div className="flex items-center gap-2 justify-end">
                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-400 uppercase tracking-wider border border-slate-100">
                       {tx.paymentMethod}
@@ -255,7 +262,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
               <div className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-4 space-y-2">
                 {tx.discountAmount > 0 && (
                   <div className="flex justify-between items-center text-[9px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 mb-2">
-                    <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : `${t.rounding} ${tx.discountValue}${tx.discountIteration && tx.discountIteration > 1 ? ` x${tx.discountIteration}` : ''}`})</span>
+                    <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : t.oneTimeOffer})</span>
                     <span>-${tx.discountAmount.toFixed(1)}</span>
                   </div>
                 )}

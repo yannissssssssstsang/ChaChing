@@ -37,9 +37,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
   const totalReceived = useMemo(() => receivedBills.reduce((a, b) => a + b, 0), [receivedBills]);
 
   // Discount state
-  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'rounding'>('none');
+  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [discountValue, setDiscountValue] = useState<number>(0);
-  const [discountIteration, setDiscountIteration] = useState<number>(1);
   const [discountTargetIds, setDiscountTargetIds] = useState<string[]>([]); // Empty means all
   
   const [showImages, setShowImages] = useState(() => {
@@ -137,11 +136,9 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
       });
     }
 
-    if (discountType === 'rounding') {
+    if (discountType === 'fixed') {
       const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-      const baseRounded = Math.floor(targetTotal / discountValue) * discountValue;
-      const roundedTotal = baseRounded - ((discountIteration - 1) * discountValue);
-      const diff = targetTotal - roundedTotal;
+      const diff = targetTotal - discountValue;
       
       if (diff <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
@@ -181,7 +178,6 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
       discountAmount: discountAmount,
       discountType: discountType !== 'none' ? discountType : undefined,
       discountValue: discountType !== 'none' ? discountValue : undefined,
-      discountIteration: discountType === 'rounding' ? discountIteration : undefined,
       paymentMethod: selectedPayment!,
       profit: cartProfit,
       customerEmail: (emailSent && customerEmail) ? customerEmail : undefined,
@@ -227,7 +223,6 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     setReceivedBills([]);
     setDiscountType('none');
     setDiscountValue(0);
-    setDiscountIteration(1);
     setDiscountTargetIds([]);
   };
 
@@ -397,13 +392,19 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       </button>
                       <button 
                         onClick={() => {
-                          const newType = discountType === 'rounding' ? 'none' : 'rounding';
+                          const newType = discountType === 'fixed' ? 'none' : 'fixed';
                           setDiscountType(newType);
-                          if (newType === 'rounding') setDiscountValue(10);
+                          if (newType === 'fixed') {
+                            const targetItems = discountTargetIds.length === 0 
+                              ? cart 
+                              : cart.filter(item => discountTargetIds.includes(item.id));
+                            const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                            setDiscountValue(targetTotal);
+                          }
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'rounding' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
                       >
-                        {t.rounding}
+                        {t.oneTimeOffer}
                       </button>
                     </div>
                   </div>
@@ -432,43 +433,20 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-2">
-                            <button 
-                              onClick={() => {
-                                if (discountType === 'rounding' && discountValue === 10) {
-                                  setDiscountIteration(prev => prev + 1);
-                                } else {
-                                  setDiscountValue(10);
-                                  setDiscountIteration(1);
-                                }
-                              }}
-                              className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountValue === 10 ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
-                            >
-                              {t.roundTo10} {discountValue === 10 && discountIteration > 1 ? `(x${discountIteration})` : ''}
-                            </button>
-                            <button 
-                              onClick={() => {
-                                if (discountType === 'rounding' && discountValue === 100) {
-                                  setDiscountIteration(prev => prev + 1);
-                                } else {
-                                  setDiscountValue(100);
-                                  setDiscountIteration(1);
-                                }
-                              }}
-                              className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountValue === 100 ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
-                            >
-                              {t.roundTo100} {discountValue === 100 && discountIteration > 1 ? `(x${discountIteration})` : ''}
-                            </button>
+                        <div className="space-y-4 animate-scale-in">
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
+                            <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                              <span className="text-slate-400 font-bold">$</span>
+                              <input 
+                                type="number" 
+                                value={discountValue}
+                                onChange={(e) => setDiscountValue(Math.max(0, parseFloat(e.target.value) || 0))}
+                                className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
+                                placeholder="0.0"
+                              />
+                            </div>
                           </div>
-                          {discountIteration > 1 && (
-                            <button 
-                              onClick={() => setDiscountIteration(1)}
-                              className="w-full py-1 text-[8px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors"
-                            >
-                              Reset Rounding
-                            </button>
-                          )}
                         </div>
                       )}
 

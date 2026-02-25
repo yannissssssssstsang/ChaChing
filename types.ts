@@ -59,7 +59,7 @@ export interface Transaction {
   total: number;
   originalTotal: number;
   discountAmount: number;
-  discountType?: 'percentage' | 'rounding';
+  discountType?: 'percentage' | 'fixed';
   discountValue?: number;
   discountIteration?: number;
   paymentMethod: string;

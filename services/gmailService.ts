@@ -95,7 +95,7 @@ export const sendReceiptEmail = async (
       <td style="padding: 8px 0; color: #a0aec0; font-size: 12px; font-weight: 700; text-align: right; text-decoration: line-through;">$${transaction.originalTotal.toFixed(1)}</td>
     </tr>
     <tr>
-      <td colspan="3" style="padding: 8px 0; color: #38a169; font-size: 12px; font-weight: 700; text-align: right; text-transform: uppercase;">Discount (${transaction.discountType === 'percentage' ? `${transaction.discountValue}%` : `Rounding ${transaction.discountValue}${transaction.discountIteration && transaction.discountIteration > 1 ? ` x${transaction.discountIteration}` : ''}`})</td>
+      <td colspan="3" style="padding: 8px 0; color: #38a169; font-size: 12px; font-weight: 700; text-align: right; text-transform: uppercase;">Discount (${transaction.discountType === 'percentage' ? `${transaction.discountValue}%` : 'One Time Offer (一口價)'})</td>
       <td style="padding: 8px 0; color: #38a169; font-size: 12px; font-weight: 700; text-align: right;">-$${transaction.discountAmount.toFixed(1)}</td>
     </tr>
   ` : '';
