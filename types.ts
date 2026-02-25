@@ -61,6 +61,7 @@ export interface Transaction {
   discountAmount: number;
   discountType?: 'percentage' | 'rounding';
   discountValue?: number;
+  discountIteration?: number;
   paymentMethod: string;
   profit: number;
   customerEmail?: string;

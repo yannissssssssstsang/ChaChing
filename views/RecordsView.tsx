@@ -129,14 +129,15 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
     const newRefunds: Refund[] = Object.entries(selectedRefundItems).map(([itemId, qty]) => {
       const item = refundingTransaction.items.find(i => i.id === itemId)!;
       const quantity = qty as number;
+      const price = item.discountedPrice || item.price;
       return {
         id: Math.random().toString(36).substr(2, 9),
         timestamp: new Date().toISOString(),
         itemId,
         itemName: item.name,
         quantity,
-        amount: item.price * quantity,
-        profitImpact: (item.price - item.cost) * quantity,
+        amount: price * quantity,
+        profitImpact: (price - item.cost) * quantity,
         reason: refundReason,
         method: refundMethod
       };
@@ -254,7 +255,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
               <div className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-4 space-y-2">
                 {tx.discountAmount > 0 && (
                   <div className="flex justify-between items-center text-[9px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 mb-2">
-                    <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : `${t.rounding} ${tx.discountValue}`})</span>
+                    <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : `${t.rounding} ${tx.discountValue}${tx.discountIteration && tx.discountIteration > 1 ? ` x${tx.discountIteration}` : ''}`})</span>
                     <span>-${tx.discountAmount.toFixed(1)}</span>
                   </div>
                 )}
