@@ -345,11 +345,20 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
             {!showReceiptChoice ? (
               <div className="space-y-6">
                 <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-2 custom-scrollbar">
-                  {cart.map(item => (
+                  {discountedCart.map(item => (
                     <div key={item.id} className="flex justify-between items-center bg-slate-50 p-4 rounded-3xl border border-slate-100">
                       <div className="flex flex-col flex-1 min-w-0 mr-4">
                         <span className="text-sm font-black text-slate-800 uppercase tracking-tight truncate">{item.name}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.price}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold uppercase tracking-widest ${item.discountedPrice !== item.price ? 'text-slate-300 line-through' : 'text-slate-400'}`}>
+                            ${item.price}
+                          </span>
+                          {item.discountedPrice !== item.price && (
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${item.discountedPrice! < item.price ? 'text-emerald-500' : 'text-blue-500'}`}>
+                              ${item.discountedPrice?.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center bg-white rounded-full p-1 border border-slate-200 shadow-sm">
                         <button onClick={() => removeFromCart(item.id)} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600"><i className="fas fa-minus text-[10px]"></i></button>
@@ -361,7 +370,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                 </div>
 
                 <div className="flex flex-col px-4 pt-4 border-t border-slate-100 space-y-2">
-                   {discountAmount > 0 && (
+                   {discountAmount !== 0 && (
                      <div className="flex justify-between items-center">
                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t.originalTotal}</span>
                        <span className="text-sm font-black text-slate-300 line-through">${originalTotal.toFixed(1)}</span>
@@ -371,10 +380,14 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.total}</span>
                      <span className="text-3xl font-black text-blue-600">${cartTotal.toFixed(1)}</span>
                    </div>
-                   {discountAmount > 0 && (
+                   {discountAmount !== 0 && (
                      <div className="flex justify-between items-center">
-                       <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{t.discountAmount}</span>
-                       <span className="text-sm font-black text-emerald-500">-${discountAmount.toFixed(1)}</span>
+                       <span className={`text-[10px] font-black uppercase tracking-widest ${discountAmount > 0 ? 'text-emerald-500' : 'text-blue-500'}`}>
+                         {discountAmount > 0 ? t.discountAmount : (lang === Language.ZH ? '價格調整' : 'Adjustment')}
+                       </span>
+                       <span className={`text-sm font-black ${discountAmount > 0 ? 'text-emerald-500' : 'text-blue-500'}`}>
+                         {discountAmount > 0 ? '-' : '+'}${Math.abs(discountAmount).toFixed(1)}
+                       </span>
                      </div>
                    )}
                 </div>
