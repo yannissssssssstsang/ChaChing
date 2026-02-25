@@ -138,19 +138,17 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     }
 
     if (discountType === 'fixed') {
-      const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-      const totalDiscount = targetTotal - oneTimeOfferPrice;
+      const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      const totalDiscount = cartTotal - oneTimeOfferPrice;
       
-      if (totalDiscount <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
+      const numUniqueTargetItems = targetItems.length;
+      if (numUniqueTargetItems === 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
-      const numUniqueItems = targetItems.length;
-      const discountPerUniqueItem = totalDiscount / numUniqueItems;
+      const discountPerUniqueItem = totalDiscount / numUniqueTargetItems;
 
       return cart.map(item => {
         const isTarget = discountTargetIds.length === 0 || discountTargetIds.includes(item.id);
         if (isTarget) {
-          // Equally divide the total discount among the unique items (product lines)
-          // Then divide that portion by the quantity of this specific item to get unit discount
           const unitDiscount = (discountPerUniqueItem / item.quantity);
           return { ...item, discountedPrice: Math.max(0, item.price - unitDiscount) };
         }
@@ -401,11 +399,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                           const newType = discountType === 'fixed' ? 'none' : 'fixed';
                           setDiscountType(newType);
                           if (newType === 'fixed') {
-                            const targetItems = discountTargetIds.length === 0 
-                              ? cart 
-                              : cart.filter(item => discountTargetIds.includes(item.id));
-                            const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-                            setOneTimeOfferPrice(targetTotal);
+                            const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                            setOneTimeOfferPrice(totalCartPrice);
                           }
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
