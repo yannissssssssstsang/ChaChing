@@ -37,6 +37,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
   const totalReceived = useMemo(() => receivedBills.reduce((a, b) => a + b, 0), [receivedBills]);
 
   // Discount state
+  const [showDiscountSection, setShowDiscountSection] = useState(false);
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [discountPercentage, setDiscountPercentage] = useState<number>(0);
   const [oneTimeOfferPrice, setOneTimeOfferPrice] = useState<number>(0);
@@ -402,35 +403,45 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                 {/* Discount Section */}
                 <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.discount}</span>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.discount}</span>
                       <button 
-                        onClick={() => {
-                          const newType = discountType === 'percentage' ? 'none' : 'percentage';
-                          setDiscountType(newType);
-                          if (newType === 'percentage' && discountPercentage === 0) setDiscountPercentage(10);
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                        onClick={() => setShowDiscountSection(!showDiscountSection)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${showDiscountSection ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}
                       >
-                        {t.percentage}
-                      </button>
-                      <button 
-                        onClick={() => {
-                          const newType = discountType === 'fixed' ? 'none' : 'fixed';
-                          setDiscountType(newType);
-                          if (newType === 'fixed') {
-                            const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-                            setOneTimeOfferPrice(totalCartPrice);
-                          }
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
-                      >
-                        {t.oneTimeOffer}
+                        <i className={`fas ${showDiscountSection ? 'fa-chevron-up' : 'fa-chevron-down'} text-[8px]`}></i>
                       </button>
                     </div>
+                    {showDiscountSection && (
+                      <div className="flex gap-2 animate-scale-in">
+                        <button 
+                          onClick={() => {
+                            const newType = discountType === 'percentage' ? 'none' : 'percentage';
+                            setDiscountType(newType);
+                            if (newType === 'percentage' && discountPercentage === 0) setDiscountPercentage(10);
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                        >
+                          {t.percentage}
+                        </button>
+                        <button 
+                          onClick={() => {
+                            const newType = discountType === 'fixed' ? 'none' : 'fixed';
+                            setDiscountType(newType);
+                            if (newType === 'fixed') {
+                              const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                              setOneTimeOfferPrice(totalCartPrice);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                        >
+                          {t.oneTimeOffer}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {discountType !== 'none' && (
+                  {showDiscountSection && discountType !== 'none' && (
                     <div className="space-y-4 animate-scale-in">
                       {discountType === 'percentage' ? (
                         <div className="flex items-center gap-3 animate-scale-in">
@@ -459,10 +470,10 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
                             <div className="flex items-center gap-3">
                               <button 
-                                onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
+                                onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
                                 className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                               >
-                                <i className="fas fa-plus"></i>
+                                <i className="fas fa-minus"></i>
                               </button>
                               
                               <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
@@ -477,10 +488,10 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                               </div>
 
                               <button 
-                                onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
+                                onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
                                 className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                               >
-                                <i className="fas fa-minus"></i>
+                                <i className="fas fa-plus"></i>
                               </button>
                             </div>
                           </div>
