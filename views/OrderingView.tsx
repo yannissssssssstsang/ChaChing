@@ -138,16 +138,20 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
 
     if (discountType === 'fixed') {
       const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-      const diff = targetTotal - discountValue;
+      const totalDiscount = targetTotal - discountValue;
       
-      if (diff <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
+      if (totalDiscount <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
-      const totalQuantity = targetItems.reduce((acc, item) => acc + item.quantity, 0);
-      const discountPerUnit = diff / totalQuantity;
+      const numUniqueItems = targetItems.length;
+      const discountPerUniqueItem = totalDiscount / numUniqueItems;
 
       return cart.map(item => {
-        if (discountTargetIds.length === 0 || discountTargetIds.includes(item.id)) {
-          return { ...item, discountedPrice: Math.max(0, item.price - discountPerUnit) };
+        const isTarget = discountTargetIds.length === 0 || discountTargetIds.includes(item.id);
+        if (isTarget) {
+          // Equally divide the total discount among the unique items (product lines)
+          // Then divide that portion by the quantity of this specific item to get unit discount
+          const unitDiscount = (discountPerUniqueItem / item.quantity);
+          return { ...item, discountedPrice: Math.max(0, item.price - unitDiscount) };
         }
         return { ...item, discountedPrice: item.price };
       });
