@@ -38,7 +38,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
 
   // Discount state
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
-  const [discountValue, setDiscountValue] = useState<number>(0);
+  const [discountPercentage, setDiscountPercentage] = useState<number>(0);
+  const [oneTimeOfferPrice, setOneTimeOfferPrice] = useState<number>(0);
   const [discountTargetIds, setDiscountTargetIds] = useState<string[]>([]); // Empty means all
   
   const [showImages, setShowImages] = useState(() => {
@@ -127,7 +128,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     if (targetItems.length === 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
     if (discountType === 'percentage') {
-      const multiplier = (100 - discountValue) / 100;
+      const multiplier = (100 - discountPercentage) / 100;
       return cart.map(item => {
         if (discountTargetIds.length === 0 || discountTargetIds.includes(item.id)) {
           return { ...item, discountedPrice: item.price * multiplier };
@@ -138,7 +139,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
 
     if (discountType === 'fixed') {
       const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-      const totalDiscount = targetTotal - discountValue;
+      const totalDiscount = targetTotal - oneTimeOfferPrice;
       
       if (totalDiscount <= 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
@@ -158,7 +159,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     }
 
     return cart.map(item => ({ ...item, discountedPrice: item.price }));
-  }, [cart, discountType, discountValue, discountTargetIds]);
+  }, [cart, discountType, discountPercentage, oneTimeOfferPrice, discountTargetIds]);
 
   const cartTotal = discountedCart.reduce((acc, item) => acc + ((item.discountedPrice || item.price) * item.quantity), 0);
   const originalTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -181,7 +182,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
       originalTotal: originalTotal,
       discountAmount: discountAmount,
       discountType: discountType !== 'none' ? discountType : undefined,
-      discountValue: discountType !== 'none' ? discountValue : undefined,
+      discountValue: discountType === 'percentage' ? discountPercentage : (discountType === 'fixed' ? oneTimeOfferPrice : undefined),
       paymentMethod: selectedPayment!,
       profit: cartProfit,
       customerEmail: (emailSent && customerEmail) ? customerEmail : undefined,
@@ -226,7 +227,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     setCurrentCoords(null);
     setReceivedBills([]);
     setDiscountType('none');
-    setDiscountValue(0);
+    setDiscountPercentage(0);
+    setOneTimeOfferPrice(0);
     setDiscountTargetIds([]);
   };
 
@@ -388,7 +390,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                         onClick={() => {
                           const newType = discountType === 'percentage' ? 'none' : 'percentage';
                           setDiscountType(newType);
-                          if (newType === 'percentage') setDiscountValue(10);
+                          if (newType === 'percentage' && discountPercentage === 0) setDiscountPercentage(10);
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
                       >
@@ -403,7 +405,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                               ? cart 
                               : cart.filter(item => discountTargetIds.includes(item.id));
                             const targetTotal = targetItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-                            setDiscountValue(targetTotal);
+                            setOneTimeOfferPrice(targetTotal);
                           }
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
@@ -418,19 +420,19 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       {discountType === 'percentage' ? (
                         <div className="flex items-center gap-3 animate-scale-in">
                           <button 
-                            onClick={() => setDiscountValue(prev => Math.max(0, prev - 5))}
+                            onClick={() => setDiscountPercentage(prev => Math.max(0, prev - 5))}
                             className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                           >
                             <i className="fas fa-minus"></i>
                           </button>
                           
                           <div className="flex-1 flex items-center justify-center gap-1 bg-white h-12 rounded-2xl border border-slate-200 shadow-sm">
-                            <span className="font-black text-slate-800 text-lg">{discountValue}</span>
+                            <span className="font-black text-slate-800 text-lg">{discountPercentage}</span>
                             <span className="text-slate-400 font-bold text-xs">%</span>
                           </div>
 
                           <button 
-                            onClick={() => setDiscountValue(prev => Math.min(100, prev + 5))}
+                            onClick={() => setDiscountPercentage(prev => Math.min(100, prev + 5))}
                             className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                           >
                             <i className="fas fa-plus"></i>
@@ -442,7 +444,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
                             <div className="flex items-center gap-3">
                               <button 
-                                onClick={() => setDiscountValue(prev => prev + 1)}
+                                onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
                                 className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                               >
                                 <i className="fas fa-plus"></i>
@@ -452,15 +454,15 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                                 <span className="text-slate-400 font-bold">$</span>
                                 <input 
                                   type="number" 
-                                  value={discountValue}
-                                  onChange={(e) => setDiscountValue(Math.max(0, parseFloat(e.target.value) || 0))}
+                                  value={oneTimeOfferPrice}
+                                  onChange={(e) => setOneTimeOfferPrice(Math.max(0, parseFloat(e.target.value) || 0))}
                                   className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
                                   placeholder="0.0"
                                 />
                               </div>
 
                               <button 
-                                onClick={() => setDiscountValue(prev => Math.max(0, prev - 1))}
+                                onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
                                 className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                               >
                                 <i className="fas fa-minus"></i>
