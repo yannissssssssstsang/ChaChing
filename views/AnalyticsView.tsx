@@ -53,19 +53,14 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
 
   // Comprehensive Product Mix Calculation
   const productMixData = useMemo(() => {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    
     const summary: Record<string, { 
       label: string; 
-      today: { units: number; revenue: number; refundedUnits: number };
-      allTime: { units: number; revenue: number; refundedUnits: number };
+      units: number; 
+      revenue: number; 
+      refundedUnits: number;
     }> = {};
 
-    transactions.forEach(tx => {
-      const txTime = new Date(tx.timestamp).getTime();
-      const isToday = txTime >= startOfToday;
-
+    filteredTransactions.forEach(tx => {
       tx.items.forEach(item => {
         // Look up the current product info to ensure category updates are reflected
         const currentProduct = products.find(p => p.id === item.id);
@@ -78,8 +73,9 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         if (!summary[key]) {
           summary[key] = { 
             label, 
-            today: { units: 0, revenue: 0, refundedUnits: 0 },
-            allTime: { units: 0, revenue: 0, refundedUnits: 0 }
+            units: 0, 
+            revenue: 0, 
+            refundedUnits: 0 
           };
         }
 
@@ -91,24 +87,16 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         const price = item.discountedPrice || item.price;
         const revenue = price * netQty;
         
-        // All Time
-        summary[key].allTime.units += netQty;
-        summary[key].allTime.refundedUnits += refundedQty;
-        summary[key].allTime.revenue += revenue;
-
-        // Today
-        if (isToday) {
-          summary[key].today.units += netQty;
-          summary[key].today.refundedUnits += refundedQty;
-          summary[key].today.revenue += revenue;
-        }
+        summary[key].units += netQty;
+        summary[key].refundedUnits += refundedQty;
+        summary[key].revenue += revenue;
       });
     });
 
     return Object.values(summary)
-      .sort((a, b) => b.allTime.units - a.allTime.units)
-      .slice(0, 8); // Top 8 for the summary list
-  }, [transactions, summaryMode, lang, products]);
+      .sort((a, b) => b.units - a.units)
+      .slice(0, 12); // Show more items in the redesigned grid
+  }, [filteredTransactions, summaryMode, lang, products]);
 
   const locationStats = useMemo(() => {
     const stats: Record<string, { lat: number; lng: number; revenue: number; count: number; name: string }> = {};
@@ -305,37 +293,33 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {productMixData.length > 0 ? productMixData.map((item, idx) => {
             return (
-              <div key={idx} className="space-y-4 p-5 bg-slate-50 rounded-[32px] border border-slate-100 transition-all hover:border-blue-200 group flex flex-col justify-between">
-                <div className="space-y-1">
-                  <span className="text-[11px] font-black text-slate-800 uppercase tracking-[0.1em] block mb-3 border-b border-slate-200 pb-2">{item.label}</span>
+              <div key={idx} className="p-5 bg-slate-50 rounded-[32px] border border-slate-100 transition-all hover:border-blue-200 group flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start border-b border-slate-200 pb-3">
+                    <span className="text-[11px] font-black text-slate-800 uppercase tracking-[0.1em] truncate max-w-[150px]">{item.label}</span>
+                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center border border-slate-200">
+                       <i className={`fas ${summaryMode === 'item' ? 'fa-tag' : 'fa-layer-group'} text-[8px] text-slate-400`}></i>
+                    </div>
+                  </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Today</p>
-                      <div>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-black text-slate-800">{item.today.units}</span>
-                          <span className="text-[8px] font-black text-slate-400 uppercase">Qty</span>
-                        </div>
-                        <p className="text-sm font-black text-blue-600">${item.today.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
-                        {item.today.refundedUnits > 0 && (
-                          <p className="text-[8px] font-black text-red-500 italic">(-{item.today.refundedUnits} ref)</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '銷售數量' : 'Sold Qty'}</p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-black text-slate-800">{item.units}</span>
+                        {item.refundedUnits > 0 && (
+                          <span className="text-[9px] font-black text-red-500">
+                            ({item.refundedUnits} {lang === Language.ZH ? '退款' : 'Ref'})
+                          </span>
                         )}
                       </div>
                     </div>
-                    
-                    <div className="space-y-2 border-l border-slate-200 pl-4">
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">All Time</p>
-                      <div>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-black text-slate-800">{item.allTime.units}</span>
-                          <span className="text-[8px] font-black text-slate-400 uppercase">Qty</span>
-                        </div>
-                        <p className="text-sm font-black text-blue-600">${item.allTime.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
-                        {item.allTime.refundedUnits > 0 && (
-                          <p className="text-[8px] font-black text-red-500 italic">(-{item.allTime.refundedUnits} ref)</p>
-                        )}
-                      </div>
+
+                    <div className="flex justify-between items-baseline">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '總收入' : 'Total Revenue'}</p>
+                      <span className="text-lg font-black text-blue-600">
+                        ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                      </span>
                     </div>
                   </div>
                 </div>
