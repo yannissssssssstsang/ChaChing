@@ -67,6 +67,27 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     return () => { if (watchId !== null) navigator.geolocation.clearWatch(watchId); };
   }, [isCheckoutOpen]);
 
+  useEffect(() => {
+    if (discountType === 'fixed') {
+      setDiscountTargetIds(prev => {
+        const next = prev.filter(id => {
+          const item = cart.find(i => i.id === id);
+          return item && item.price >= oneTimeOfferPrice;
+        });
+        if (next.length !== prev.length) return next;
+        return prev;
+      });
+    }
+    
+    const eligibleItems = discountType === 'fixed' 
+      ? cart.filter(item => item.price >= oneTimeOfferPrice)
+      : cart;
+      
+    if (eligibleItems.length > 0 && discountTargetIds.length > 0 && discountTargetIds.length >= eligibleItems.length) {
+      setDiscountTargetIds([]);
+    }
+  }, [cart, oneTimeOfferPrice, discountType, discountTargetIds.length]);
+
   const availableProducts = useMemo(() => products.filter(p => !p.isExtracting), [products]);
 
   const filteredProducts = useMemo(() => {
@@ -141,13 +162,21 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
       const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
       const totalDiscount = cartTotal - oneTimeOfferPrice;
       
+      // Filter items that are eligible (price >= oneTimeOfferPrice)
+      const eligibleItems = cart.filter(item => item.price >= oneTimeOfferPrice);
+      
+      // Determine target items from eligible ones
+      const targetItems = discountTargetIds.length === 0 
+        ? eligibleItems 
+        : eligibleItems.filter(item => discountTargetIds.includes(item.id));
+      
       const numUniqueTargetItems = targetItems.length;
       if (numUniqueTargetItems === 0) return cart.map(item => ({ ...item, discountedPrice: item.price }));
 
       const discountPerUniqueItem = totalDiscount / numUniqueTargetItems;
 
       return cart.map(item => {
-        const isTarget = discountTargetIds.length === 0 || discountTargetIds.includes(item.id);
+        const isTarget = targetItems.some(t => t.id === item.id);
         if (isTarget) {
           const unitDiscount = (discountPerUniqueItem / item.quantity);
           return { ...item, discountedPrice: Math.max(0, item.price - unitDiscount) };
@@ -414,6 +443,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                           if (newType === 'fixed') {
                             const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
                             setOneTimeOfferPrice(totalCartPrice);
+                            setDiscountTargetIds([]);
                           }
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
@@ -489,25 +519,29 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                           >
                             {t.applyToAll}
                           </button>
-                          {cart.map(item => (
-                            <button 
-                              key={item.id}
-                              onClick={() => {
-                                setDiscountTargetIds(prev => {
-                                  if (prev.length === 0) {
-                                    // If currently "All", select only this item
-                                    return [item.id];
-                                  }
-                                  return prev.includes(item.id) 
-                                    ? prev.filter(id => id !== item.id) 
-                                    : [...prev, item.id]
-                                });
-                              }}
-                              className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all ${discountTargetIds.includes(item.id) ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-white text-slate-300 border border-slate-100'}`}
-                            >
-                              {item.name}
-                            </button>
-                          ))}
+                          {cart.map(item => {
+                            const isDisabled = discountType === 'fixed' && item.price < oneTimeOfferPrice;
+                            return (
+                              <button 
+                                key={item.id}
+                                disabled={isDisabled}
+                                onClick={() => {
+                                  setDiscountTargetIds(prev => {
+                                    if (prev.length === 0) {
+                                      // If currently "All", select only this item
+                                      return [item.id];
+                                    }
+                                    return prev.includes(item.id) 
+                                      ? prev.filter(id => id !== item.id) 
+                                      : [...prev, item.id]
+                                  });
+                                }}
+                                className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all ${discountTargetIds.includes(item.id) ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-white text-slate-300 border border-slate-100'} ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+                              >
+                                {item.name}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
