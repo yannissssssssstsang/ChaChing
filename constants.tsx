@@ -80,7 +80,7 @@ export const TRANSLATIONS = {
     applyDiscount: 'Apply Discount',
     discountType: 'Discount Type',
     percentage: 'Percentage (%)',
-    oneTimeOffer: 'One Time Offer (一口價)',
+    oneTimeOffer: 'One Time Offer',
     targetPrice: 'Target Price',
     applyToAll: 'Apply to All Items',
     applyToSelected: 'Apply to Selected Items',
