@@ -81,9 +81,16 @@ const App: React.FC = () => {
     if (savedSettlement) setSettlementConfig(JSON.parse(savedSettlement));
   }, []);
 
+  const getLocalDateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleManualSettle = useCallback(async (options: { skipDownload?: boolean; isAuto?: boolean } = {}) => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = getLocalDateString(today);
     
     // Improved date filtering to handle local vs UTC differences more reliably
     const todaysTransactions = transactions.filter(tx => {
@@ -95,14 +102,13 @@ const App: React.FC = () => {
     
     if (todaysTransactions.length === 0) {
       const msg = t.settlementSkipped;
-      
       console.log(msg);
       
       if (!options.isAuto) {
         alert(msg);
       }
 
-      // Still mark as settled for today to prevent repeated auto-triggers
+      // Mark as settled for today to prevent repeated auto-triggers
       const newConfig = { ...settlementConfig, lastSettledDate: todayStr };
       setSettlementConfig(newConfig);
       localStorage.setItem('stall_settlement_config', JSON.stringify(newConfig));
@@ -110,6 +116,7 @@ const App: React.FC = () => {
     }
     
     const { fileName, blob } = generateSettlementExcel(todaysTransactions, products);
+    let operationSuccess = false;
     
     // 1. Local Download as backup (only if not skipped)
     if (!options.skipDownload) {
@@ -119,6 +126,7 @@ const App: React.FC = () => {
       a.download = fileName;
       a.click();
       URL.revokeObjectURL(url);
+      operationSuccess = true;
     }
 
     // 2. Cloud Upload if possible
@@ -132,15 +140,19 @@ const App: React.FC = () => {
         }
       } else {
         console.log(t.settlementSuccess);
+        operationSuccess = true;
       }
     } else if (!options.isAuto) {
       alert(t.settlementOffline);
     }
     
-    const newConfig = { ...settlementConfig, lastSettledDate: todayStr };
-    setSettlementConfig(newConfig);
-    localStorage.setItem('stall_settlement_config', JSON.stringify(newConfig));
-  }, [transactions, products, settlementConfig, isLoggedIn, isOnline, lang]);
+    // Only mark as settled if at least one operation succeeded
+    if (operationSuccess) {
+      const newConfig = { ...settlementConfig, lastSettledDate: todayStr };
+      setSettlementConfig(newConfig);
+      localStorage.setItem('stall_settlement_config', JSON.stringify(newConfig));
+    }
+  }, [transactions, products, settlementConfig, isLoggedIn, isOnline, lang, t.settlementSkipped, t.settlementFailed, t.settlementSuccess, t.settlementOffline]);
 
   const addLog = useCallback((productId: string, productName: string, field: ProductChangeLog['field'], oldValue: string | number, newValue: string | number) => {
     const log: ProductChangeLog = {
@@ -199,7 +211,7 @@ const App: React.FC = () => {
       if (!config.enabled) return;
 
       const now = new Date();
-      const todayStr = now.toISOString().split('T')[0];
+      const todayStr = getLocalDateString(now);
       
       // If already settled today, skip
       if (config.lastSettledDate === todayStr) return;

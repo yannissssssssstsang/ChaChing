@@ -267,7 +267,7 @@ const updateOrCreateFile = async (token: string, folderId: string, fileName: str
 export const listDriveFiles = async (): Promise<{ files: any[], error?: string }> => {
   const token = getAccessToken();
   if (!token) return { files: [], error: "No token" };
-  const query = "(mimeType contains 'image/' or mimeType = 'application/vnd.google-apps.spreadsheet' or mimeType = 'text/csv') and trashed = false";
+  const query = "(mimeType contains 'image/' or mimeType = 'application/vnd.google-apps.spreadsheet' or mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed = false";
   const resp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,thumbnailLink,mimeType)&pageSize=50`, {
     headers: { 'Authorization': `Bearer ${token}` }
   });

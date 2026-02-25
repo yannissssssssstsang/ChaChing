@@ -132,7 +132,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
 
     for (const f of files) {
       if (f instanceof File) {
-        if (f.name.match(/\.(xlsx|xls|csv)$/i)) dataBatch.push({ name: f.name, blob: f });
+        if (f.name.match(/\.(xlsx)$/i)) dataBatch.push({ name: f.name, blob: f });
         else if (f.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
           const base64 = await new Promise<string>((res) => {
             const reader = new FileReader();
@@ -339,7 +339,6 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   const getFileIcon = (file: any) => {
     if (file.mimeType.includes('image/')) return 'fa-image';
     if (file.mimeType.includes('spreadsheet') || file.mimeType.includes('excel')) return 'fa-file-excel';
-    if (file.mimeType.includes('csv')) return 'fa-file-csv';
     return 'fa-file';
   };
 
@@ -425,14 +424,14 @@ const InventoryView: React.FC<InventoryViewProps> = ({
             <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fas fa-laptop-code text-2xl"></i></div>
             <div>
               <p className="font-black text-slate-800 uppercase tracking-wider text-[11px] mb-1">Local Drive</p>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Excel / CSV / Images</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Excel (.xlsx) / Images</p>
             </div>
           </button>
           <button onClick={() => setShowDrivePicker(true)} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
             <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fab fa-google-drive text-2xl"></i></div>
             <div>
               <p className="font-black text-slate-800 uppercase tracking-wider text-[11px] mb-1">Google Drive</p>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Excel / CSV / Images</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Sheets / .xlsx / Images</p>
             </div>
           </button>
           <button onClick={() => { setEditingProduct({ id: Math.random().toString(36).substr(2, 9), name: '', price: 0, cost: 0, stock: 0, category: '' }); setShowAddMenu(false); }} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
@@ -707,7 +706,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
           </div>
         </div>
       )}
-      <input type="file" ref={localInputRef} onChange={handleLocalUpload} className="hidden" multiple accept=".xlsx,.xls,.csv,image/*" />
+      <input type="file" ref={localInputRef} onChange={handleLocalUpload} className="hidden" multiple accept=".xlsx,image/*" />
     </div>
   );
 };
