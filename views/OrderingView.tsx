@@ -37,7 +37,6 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
   const totalReceived = useMemo(() => receivedBills.reduce((a, b) => a + b, 0), [receivedBills]);
 
   // Discount state
-  const [showDiscountSection, setShowDiscountSection] = useState(false);
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [discountPercentage, setDiscountPercentage] = useState<number>(0);
   const [oneTimeOfferPrice, setOneTimeOfferPrice] = useState<number>(0);
@@ -401,99 +400,108 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                 </div>
 
                 {/* Discount Section */}
-                <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4">
+                <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-6">
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.discount}</span>
-                      <button 
-                        onClick={() => setShowDiscountSection(!showDiscountSection)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${showDiscountSection ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}
-                      >
-                        <i className={`fas ${showDiscountSection ? 'fa-chevron-up' : 'fa-chevron-down'} text-[8px]`}></i>
-                      </button>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest">{t.discount}</span>
+                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{discountType !== 'none' ? (lang === Language.ZH ? '已開啟' : 'Enabled') : (lang === Language.ZH ? '已關閉' : 'Disabled')}</span>
                     </div>
-                    {showDiscountSection && (
-                      <div className="flex gap-2 animate-scale-in">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={discountType !== 'none'} 
+                        onChange={() => {
+                          if (discountType !== 'none') {
+                            setDiscountType('none');
+                          } else {
+                            setDiscountType('percentage');
+                            if (discountPercentage === 0) setDiscountPercentage(10);
+                          }
+                        }}
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+
+                  {discountType !== 'none' && (
+                    <div className="space-y-6 animate-scale-in">
+                      <div className="bg-slate-100 p-1 rounded-2xl flex items-center gap-1 w-full">
                         <button 
-                          onClick={() => {
-                            const newType = discountType === 'percentage' ? 'none' : 'percentage';
-                            setDiscountType(newType);
-                            if (newType === 'percentage' && discountPercentage === 0) setDiscountPercentage(10);
-                          }}
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                          onClick={() => setDiscountType('percentage')}
+                          className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'percentage' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
                         >
                           {t.percentage}
                         </button>
                         <button 
                           onClick={() => {
-                            const newType = discountType === 'fixed' ? 'none' : 'fixed';
-                            setDiscountType(newType);
-                            if (newType === 'fixed') {
-                              const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-                              setOneTimeOfferPrice(totalCartPrice);
-                            }
+                            setDiscountType('fixed');
+                            const totalCartPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                            setOneTimeOfferPrice(totalCartPrice);
                           }}
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-200'}`}
+                          className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${discountType === 'fixed' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
                         >
                           {t.oneTimeOffer}
                         </button>
                       </div>
-                    )}
-                  </div>
 
-                  {showDiscountSection && discountType !== 'none' && (
-                    <div className="space-y-4 animate-scale-in">
                       {discountType === 'percentage' ? (
-                        <div className="flex items-center gap-3 animate-scale-in">
-                          <button 
-                            onClick={() => setDiscountPercentage(prev => Math.max(0, prev - 5))}
-                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
-                          >
-                            <i className="fas fa-minus"></i>
-                          </button>
-                          
-                          <div className="flex-1 flex items-center justify-center gap-1 bg-white h-12 rounded-2xl border border-slate-200 shadow-sm">
-                            <span className="font-black text-slate-800 text-lg">{discountPercentage}</span>
-                            <span className="text-slate-400 font-bold text-xs">%</span>
-                          </div>
+                        <div className="flex flex-col gap-2 animate-scale-in">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.percentage}</span>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => setDiscountPercentage(prev => Math.max(0, prev - 5))}
+                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                            >
+                              <i className="fas fa-minus"></i>
+                            </button>
+                            
+                            <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
+                              <input 
+                                type="number" 
+                                value={discountPercentage}
+                                onChange={(e) => setDiscountPercentage(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
+                                className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
+                              />
+                              <span className="text-slate-400 font-bold text-xs">%</span>
+                            </div>
 
-                          <button 
-                            onClick={() => setDiscountPercentage(prev => Math.min(100, prev + 5))}
-                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
-                          >
-                            <i className="fas fa-plus"></i>
-                          </button>
+                            <button 
+                              onClick={() => setDiscountPercentage(prev => Math.min(100, prev + 5))}
+                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                            >
+                              <i className="fas fa-plus"></i>
+                            </button>
+                          </div>
                         </div>
                       ) : (
-                        <div className="space-y-4 animate-scale-in">
-                          <div className="flex flex-col gap-2">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
-                            <div className="flex items-center gap-3">
-                              <button 
-                                onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
-                                className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
-                              >
-                                <i className="fas fa-minus"></i>
-                              </button>
-                              
-                              <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
-                                <span className="text-slate-400 font-bold">$</span>
-                                <input 
-                                  type="number" 
-                                  value={oneTimeOfferPrice}
-                                  onChange={(e) => setOneTimeOfferPrice(Math.max(0, parseFloat(e.target.value) || 0))}
-                                  className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
-                                  placeholder="0.0"
-                                />
-                              </div>
-
-                              <button 
-                                onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
-                                className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
-                              >
-                                <i className="fas fa-plus"></i>
-                              </button>
+                        <div className="flex flex-col gap-2 animate-scale-in">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
+                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                            >
+                              <i className="fas fa-minus"></i>
+                            </button>
+                            
+                            <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
+                              <span className="text-slate-400 font-bold">$</span>
+                              <input 
+                                type="number" 
+                                value={oneTimeOfferPrice}
+                                onChange={(e) => setOneTimeOfferPrice(Math.max(0, parseFloat(e.target.value) || 0))}
+                                className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
+                                placeholder="0.0"
+                              />
                             </div>
+
+                            <button 
+                              onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
+                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                            >
+                              <i className="fas fa-plus"></i>
+                            </button>
                           </div>
                         </div>
                       )}
