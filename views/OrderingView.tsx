@@ -448,27 +448,27 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       {discountType === 'percentage' ? (
                         <div className="flex flex-col gap-2 animate-scale-in">
                           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.percentage}</span>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <button 
                               onClick={() => setDiscountPercentage(prev => Math.max(0, prev - 5))}
-                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                              className="w-12 h-12 shrink-0 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                             >
                               <i className="fas fa-minus"></i>
                             </button>
                             
-                            <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="flex-1 flex items-center gap-1 bg-white px-3 h-12 rounded-2xl border border-slate-200 shadow-sm min-w-0">
                               <input 
                                 type="number" 
                                 value={discountPercentage}
                                 onChange={(e) => setDiscountPercentage(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
-                                className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
+                                className="w-full bg-transparent outline-none font-black text-slate-800 text-right text-base"
                               />
-                              <span className="text-slate-400 font-bold text-xs">%</span>
+                              <span className="text-slate-400 font-bold text-xs shrink-0">%</span>
                             </div>
 
                             <button 
                               onClick={() => setDiscountPercentage(prev => Math.min(100, prev + 5))}
-                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                              className="w-12 h-12 shrink-0 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                             >
                               <i className="fas fa-plus"></i>
                             </button>
@@ -477,28 +477,28 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       ) : (
                         <div className="flex flex-col gap-2 animate-scale-in">
                           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.targetPrice}</span>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <button 
                               onClick={() => setOneTimeOfferPrice(prev => Math.max(0, prev - 5))}
-                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                              className="w-12 h-12 shrink-0 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                             >
                               <i className="fas fa-minus"></i>
                             </button>
                             
-                            <div className="flex-1 flex items-center gap-2 bg-white px-4 h-12 rounded-2xl border border-slate-200 shadow-sm">
-                              <span className="text-slate-400 font-bold">$</span>
+                            <div className="flex-1 flex items-center gap-1 bg-white px-3 h-12 rounded-2xl border border-slate-200 shadow-sm min-w-0">
+                              <span className="text-slate-400 font-bold shrink-0">$</span>
                               <input 
                                 type="number" 
                                 value={oneTimeOfferPrice}
                                 onChange={(e) => setOneTimeOfferPrice(Math.max(0, parseFloat(e.target.value) || 0))}
-                                className="flex-1 bg-transparent outline-none font-black text-slate-800 text-right"
+                                className="w-full bg-transparent outline-none font-black text-slate-800 text-right text-base"
                                 placeholder="0.0"
                               />
                             </div>
 
                             <button 
                               onClick={() => setOneTimeOfferPrice(prev => prev + 5)}
-                              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
+                              className="w-12 h-12 shrink-0 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                             >
                               <i className="fas fa-plus"></i>
                             </button>

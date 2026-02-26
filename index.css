@@ -163,3 +163,13 @@ body {
 .dark-mode ::-webkit-scrollbar-thumb:hover {
     background: #334155;
 }
+
+/* Hide number input arrows */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
