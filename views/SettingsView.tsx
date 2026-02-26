@@ -238,51 +238,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         </button>
       </div>
 
-      {/* Daily Settlement Section */}
-      <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">{t.dailySettlement}</h3>
-            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">{t.settlementDescription}</p>
-          </div>
-          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-            <i className="fas fa-file-excel"></i>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-6 items-center">
-          <div className="flex-1 w-full space-y-4">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-               <span className="text-xs font-black text-slate-500 uppercase tracking-tight">{t.enableAutoSettlement}</span>
-               <button 
-                onClick={() => onUpdateSettlementConfig({...settlementConfig, enabled: !settlementConfig.enabled})}
-                className={`w-12 h-6 rounded-full transition-colors relative ${settlementConfig.enabled ? 'bg-blue-600' : 'bg-slate-200'}`}
-               >
-                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settlementConfig.enabled ? 'right-1' : 'left-1'}`}></div>
-               </button>
-            </div>
-            
-            <div className={`space-y-2 transition-opacity ${settlementConfig.enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.settlementTime}</label>
-              <input 
-                type="time" 
-                value={settlementConfig.time} 
-                onChange={e => onUpdateSettlementConfig({...settlementConfig, time: e.target.value})}
-                className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black text-slate-800 outline-none focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-auto">
-            <button 
-              onClick={onManualSettle}
-              className="w-full md:w-auto px-8 py-5 bg-slate-800 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-slate-200 active:scale-95 transition-all"
-            >
-              <i className="fas fa-file-export"></i>
-              {t.settleNow}
-            </button>
-          </div>
-        </div>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.settings}</h2>
+        <button 
+          onClick={handleSaveAll}
+          disabled={isSyncing}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 ${isSavedLocally ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+        >
+          {isSyncing ? <i className="fas fa-sync fa-spin"></i> : <i className={`fas ${isSavedLocally ? 'fa-check' : 'fa-save'}`}></i>}
+          {isSyncing ? 'Syncing...' : (isSavedLocally ? 'Saved & Synced' : 'Save & Sync All')}
+        </button>
       </div>
 
       <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
@@ -331,6 +296,53 @@ const SettingsView: React.FC<SettingsViewProps> = ({
              </p>
           </div>
           <div className={`w-2.5 h-2.5 rounded-full ${diagStatus?.ok ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`}></div>
+        </div>
+      </div>
+
+      {/* Daily Settlement Section */}
+      <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">{t.dailySettlement}</h3>
+            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">{t.settlementDescription}</p>
+          </div>
+          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+            <i className="fas fa-file-excel"></i>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="flex-1 w-full space-y-4">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+               <span className="text-xs font-black text-slate-500 uppercase tracking-tight">{t.enableAutoSettlement}</span>
+               <button 
+                onClick={() => onUpdateSettlementConfig({...settlementConfig, enabled: !settlementConfig.enabled})}
+                className={`w-12 h-6 rounded-full transition-colors relative ${settlementConfig.enabled ? 'bg-blue-600' : 'bg-slate-200'}`}
+               >
+                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settlementConfig.enabled ? 'right-1' : 'left-1'}`}></div>
+               </button>
+            </div>
+            
+            <div className={`space-y-2 transition-opacity ${settlementConfig.enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.settlementTime}</label>
+              <input 
+                type="time" 
+                value={settlementConfig.time} 
+                onChange={e => onUpdateSettlementConfig({...settlementConfig, time: e.target.value})}
+                className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black text-slate-800 outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="w-full md:w-auto">
+            <button 
+              onClick={onManualSettle}
+              className="w-full md:w-auto px-8 py-5 bg-slate-800 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-slate-200 active:scale-95 transition-all"
+            >
+              <i className="fas fa-file-export"></i>
+              {t.settleNow}
+            </button>
+          </div>
         </div>
       </div>
 
