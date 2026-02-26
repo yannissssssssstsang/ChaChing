@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Language, PaymentQRCodes, TelegramConfig, ReceiptConfig, SettlementConfig } from '../types';
+import { Language, PaymentQRCodes, TelegramConfig, ReceiptConfig, SettlementConfig, SyncStatus } from '../types';
 import { TRANSLATIONS } from '../constants';
 import { verifyGoogleConnection, ConnectionStatus, listDriveFiles, getDriveFileAsBase64 } from '../services/googleDriveService';
 import { extractBusinessCardInfo } from '../services/geminiService';
@@ -14,7 +14,7 @@ interface SettingsViewProps {
   onLogout: () => void;
   onTestTelegram: () => Promise<boolean | undefined>;
   onForceSync: () => Promise<void>;
-  isSyncing?: boolean;
+  syncStatus: SyncStatus;
   receiptConfig: ReceiptConfig;
   onUpdateReceiptConfig: (config: ReceiptConfig) => void;
   onForceDownload: () => Promise<void>;
@@ -75,7 +75,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onLogout,
   onTestTelegram,
   onForceSync,
-  isSyncing,
+  syncStatus,
   receiptConfig,
   onUpdateReceiptConfig,
   onForceDownload,
@@ -94,7 +94,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   
   const [activeUploadMethod, setActiveUploadMethod] = useState<string | null>(null);
   const [brandingTarget, setBrandingTarget] = useState<'logo' | 'businessCard' | null>(null);
-  const [isSavedLocally, setIsSavedLocally] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   
   const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -193,12 +192,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     setIsCustomMode(false);
   };
 
-  const handleSaveAll = async () => {
-    setIsSavedLocally(true);
-    await onForceSync();
-    setTimeout(() => setIsSavedLocally(false), 2000);
-  };
-
   const handleManualDownload = async () => {
     setIsDownloading(true);
     await onForceDownload();
@@ -232,22 +225,24 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     <div className="space-y-6 pb-20">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.settings}</h2>
-        <div className="flex gap-3">
-          <button 
-            onClick={handleSaveAll}
-            disabled={isSyncing}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 ${isSavedLocally ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-          >
-            {isSyncing ? <i className="fas fa-sync fa-spin"></i> : <i className={`fas ${isSavedLocally ? 'fa-check' : 'fa-save'}`}></i>}
-            {isSyncing ? 'Syncing...' : (isSavedLocally ? 'Saved & Synced' : 'Save & Sync All')}
-          </button>
-        </div>
       </div>
 
       <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
         <div className="flex justify-between items-center">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Cloud Backup & Recovery</h3>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
+              <div className={`w-1.5 h-1.5 rounded-full ${
+                syncStatus === 'synced' ? 'bg-emerald-500' : 
+                syncStatus === 'syncing' ? 'bg-blue-500 animate-pulse' : 
+                syncStatus === 'offline' ? 'bg-amber-500' : 'bg-red-500'
+              }`}></div>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                {syncStatus === 'synced' ? 'Synced' : 
+                 syncStatus === 'syncing' ? 'Syncing' : 
+                 syncStatus === 'offline' ? 'Offline' : 'Sync Error'}
+              </span>
+            </div>
             <button 
               onClick={handleManualDownload}
               disabled={isDownloading}

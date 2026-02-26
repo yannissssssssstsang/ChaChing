@@ -497,7 +497,7 @@ const App: React.FC = () => {
               onLogout={handleLogout} 
               onTestTelegram={async () => true} 
               onForceSync={handleCloudSync} 
-              isSyncing={syncStatus === 'syncing'} 
+              syncStatus={syncStatus}
               receiptConfig={receiptConfig} 
               onUpdateReceiptConfig={setReceiptConfig} 
               onForceDownload={handleCloudDownload} 
