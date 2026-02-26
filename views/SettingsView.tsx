@@ -252,6 +252,18 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               Recover from Cloud
             </button>
             <button 
+              onClick={() => onForceSync()}
+              disabled={isOfflineMode || syncStatus === 'syncing'}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
+                isOfflineMode 
+                  ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed' 
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
+              }`}
+            >
+              {syncStatus === 'syncing' ? <i className="fas fa-sync fa-spin"></i> : <i className="fas fa-cloud-arrow-up"></i>}
+              Sync Now
+            </button>
+            <button 
               onClick={runCloudDiagnostic}
               disabled={isCheckingDiag}
               className="px-4 py-1.5 rounded-full bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-widest border border-slate-100 hover:bg-slate-100 transition-all"
