@@ -84,7 +84,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
           .reduce((acc, r) => acc + r.quantity, 0);
         
         const netQty = item.quantity - refundedQty;
-        const price = item.discountedPrice || item.price;
+        const price = item.discountedPrice !== undefined ? item.discountedPrice : item.price;
         const revenue = price * netQty;
         
         summary[key].units += netQty;
@@ -248,76 +248,74 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="dashboard-card p-6 border-l-4 border-l-slate-800 flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.revenue}</p>
-          <p className="text-3xl font-black text-slate-800">${totalRevenue.toLocaleString()}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="dashboard-card p-4 border-l-4 border-l-slate-800 flex flex-col justify-between">
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t.revenue}</p>
+          <p className="text-2xl font-black text-slate-800">${totalRevenue.toLocaleString()}</p>
         </div>
-        <div className="dashboard-card p-6 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.profit}</p>
-          <p className="text-3xl font-black text-slate-800">${totalProfit.toLocaleString()}</p>
+        <div className="dashboard-card p-4 border-l-4 border-l-emerald-500 flex flex-col justify-between">
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t.profit}</p>
+          <p className="text-2xl font-black text-slate-800">${totalProfit.toLocaleString()}</p>
         </div>
-        <div className="dashboard-card p-6 flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Net Sales</p>
-          <p className="text-3xl font-black text-slate-800">{filteredTransactions.length}</p>
+        <div className="dashboard-card p-4 flex flex-col justify-between">
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Net Sales</p>
+          <p className="text-2xl font-black text-slate-800">{filteredTransactions.length}</p>
         </div>
-        <div className="dashboard-card p-6 flex flex-col justify-between border-l-4 border-l-red-400">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.refundCount}</p>
-          <p className="text-3xl font-black text-red-600">{totalRefundCount}</p>
+        <div className="dashboard-card p-4 flex flex-col justify-between border-l-4 border-l-red-400">
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t.refundCount}</p>
+          <p className="text-2xl font-black text-red-600">{totalRefundCount}</p>
         </div>
       </div>
 
       {/* Product Mix Summary Section */}
-      <div className="dashboard-card p-6 md:p-8 space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="dashboard-card p-5 space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <div>
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">Product Mix Summary</h3>
-            <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Distribution of net sales volume</p>
+            <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">Product Mix Summary</h3>
+            <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Distribution of net sales volume</p>
           </div>
-          <div className="bg-slate-100 p-1 rounded-2xl flex items-center gap-1">
+          <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1">
             <button 
               onClick={() => setSummaryMode('item')}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${summaryMode === 'item' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
+              className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${summaryMode === 'item' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
             >
               {lang === Language.ZH ? '按單品' : 'By Item'}
             </button>
             <button 
               onClick={() => setSummaryMode('category')}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${summaryMode === 'category' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
+              className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${summaryMode === 'category' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
             >
               {lang === Language.ZH ? '按分類' : 'By Category'}
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {productMixData.length > 0 ? productMixData.map((item, idx) => {
             return (
-              <div key={idx} className="p-5 bg-slate-50 rounded-[32px] border border-slate-100 transition-all hover:border-blue-200 group flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start border-b border-slate-200 pb-3">
-                    <span className="text-[11px] font-black text-slate-800 uppercase tracking-[0.1em] truncate max-w-[150px]">{item.label}</span>
-                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                       <i className={`fas ${summaryMode === 'item' ? 'fa-tag' : 'fa-layer-group'} text-[8px] text-slate-400`}></i>
-                    </div>
+              <div key={idx} className="p-4 bg-white rounded-2xl border border-slate-100 transition-all hover:border-blue-200 shadow-sm group flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-tight truncate max-w-[140px]">{item.label}</span>
+                    <i className={`fas ${summaryMode === 'item' ? 'fa-tag' : 'fa-layer-group'} text-[8px] text-slate-300`}></i>
                   </div>
                   
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-baseline">
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '銷售數量' : 'Sold Qty'}</p>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-slate-800">{item.units}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '數量' : 'Qty'}</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-black text-slate-800">{item.units}</span>
                         {item.refundedUnits > 0 && (
-                          <span className="text-[9px] font-black text-red-500">
-                            ({item.refundedUnits} {lang === Language.ZH ? '退款' : 'Ref'})
+                          <span className="text-[8px] font-bold text-red-400 bg-red-50 px-1 rounded">
+                            -{item.refundedUnits}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-baseline">
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '總收入' : 'Total Revenue'}</p>
-                      <span className="text-lg font-black text-blue-600">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '收入' : 'Rev'}</p>
+                      <span className="text-sm font-black text-blue-600">
                         ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       </span>
                     </div>
@@ -334,12 +332,12 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="dashboard-card overflow-hidden lg:col-span-8 h-[500px] flex flex-col">
-          <div className="p-4 px-6 border-b border-slate-50 flex justify-between items-center bg-white shrink-0 z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="dashboard-card overflow-hidden lg:col-span-8 h-[400px] flex flex-col">
+          <div className="p-3 px-5 border-b border-slate-50 flex justify-between items-center bg-white shrink-0 z-10">
             <div>
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">Transaction Density Map</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Spatial concentration of net sales</p>
+              <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">Transaction Density Map</h3>
+              <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Spatial concentration of net sales</p>
             </div>
           </div>
           <div className="flex-1 relative bg-slate-50">
@@ -347,33 +345,33 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
           </div>
         </div>
 
-        <div className="dashboard-card p-6 lg:col-span-4 h-[500px] flex flex-col">
-          <div className="flex justify-between items-center mb-8 shrink-0">
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">{t.bestSellers}</h3>
-            <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center text-amber-500">
-              <i className="fas fa-crown text-sm"></i>
+        <div className="dashboard-card p-4 lg:col-span-4 h-[400px] flex flex-col">
+          <div className="flex justify-between items-center mb-4 shrink-0">
+            <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">{t.bestSellers}</h3>
+            <div className="w-6 h-6 bg-amber-50 rounded-lg flex items-center justify-center text-amber-500">
+              <i className="fas fa-crown text-[10px]"></i>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-6">
+          <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-4">
             {bestSellers.length > 0 ? bestSellers.map((item, i) => (
               <div key={i} className="group relative">
-                <div className="flex justify-between items-end mb-2">
-                  <span className="text-sm font-black text-slate-800 uppercase tracking-tight">{item.name}</span>
-                  <span className="text-[10px] font-black text-blue-600">{item.count} Sold</span>
+                <div className="flex justify-between items-end mb-1">
+                  <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{item.name}</span>
+                  <span className="text-[9px] font-black text-blue-600">{item.count} Sold</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(item.count / Math.max(...bestSellers.map(b => b.count))) * 100}%` }}></div>
                 </div>
               </div>
-            )) : <p className="text-center py-20 opacity-30 text-xs uppercase font-black">No records</p>}
+            )) : <p className="text-center py-20 opacity-30 text-[10px] uppercase font-black">No records</p>}
           </div>
         </div>
 
-        <div className="dashboard-card p-6 lg:col-span-12 h-[400px] flex flex-col">
-          <div className="flex justify-between items-center mb-8 shrink-0">
+        <div className="dashboard-card p-4 lg:col-span-12 h-[300px] flex flex-col">
+          <div className="flex justify-between items-center mb-4 shrink-0">
             <div>
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">Revenue Velocity</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">{range === 'today' ? 'Real-time hourly breakdown' : 'Historical aggregate by hour'}</p>
+              <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">Revenue Velocity</h3>
+              <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{range === 'today' ? 'Real-time hourly breakdown' : 'Historical aggregate by hour'}</p>
             </div>
           </div>
           <div className="flex-1">
@@ -385,10 +383,10 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="hour" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontWeight: 800}} />
+                <XAxis dataKey="hour" fontSize={8} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontWeight: 800}} />
                 <YAxis hide={true} domain={['auto', 'auto']} />
-                <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} />
-                <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={5} fill="url(#colorRevenue)" animationDuration={2000} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '10px' }} />
+                <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={3} fill="url(#colorRevenue)" animationDuration={2000} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

@@ -166,10 +166,10 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     return cart.map(item => ({ ...item, discountedPrice: item.price }));
   }, [cart, discountType, discountPercentage, oneTimeOfferPrice, discountTargetIds]);
 
-  const cartTotal = discountedCart.reduce((acc, item) => acc + ((item.discountedPrice || item.price) * item.quantity), 0);
+  const cartTotal = discountedCart.reduce((acc, item) => acc + ((item.discountedPrice !== undefined ? item.discountedPrice : item.price) * item.quantity), 0);
   const originalTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const discountAmount = originalTotal - cartTotal;
-  const cartProfit = discountedCart.reduce((acc, item) => acc + (((item.discountedPrice || item.price) - item.cost) * item.quantity), 0);
+  const cartProfit = discountedCart.reduce((acc, item) => acc + (((item.discountedPrice !== undefined ? item.discountedPrice : item.price) - item.cost) * item.quantity), 0);
 
   const changeDue = useMemo(() => {
     return Math.max(0, totalReceived - cartTotal);
