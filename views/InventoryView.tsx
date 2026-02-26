@@ -168,8 +168,11 @@ const InventoryView: React.FC<InventoryViewProps> = ({
         });
 
         data.forEach(row => {
-          const name = String(row.Name || row['名稱'] || row.ProductName || '').trim();
+          let name = String(row.Name || row['名稱'] || row.ProductName || '').trim();
           if (!name) return;
+          // Enforce 30 character limit
+          if (name.length > 30) name = name.substring(0, 30);
+          
           const productData = {
             price: parseFloat(row.Price || row['價格'] || row['單價'] || 0),
             cost: parseFloat(row.Cost || row['成本'] || 0),
@@ -201,9 +204,12 @@ const InventoryView: React.FC<InventoryViewProps> = ({
         if (matchedProduct) {
           onUpdateProduct({ ...matchedProduct, image: thumb });
         } else {
+          let finalName = fileNameWithoutExt;
+          if (finalName.length > 30) finalName = finalName.substring(0, 30);
+
           onAddProduct({
             id: Math.random().toString(36).substr(2, 9),
-            name: fileNameWithoutExt,
+            name: finalName,
             price: 0,
             cost: 0,
             category: '',
@@ -272,10 +278,14 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   };
 
   const handleDuplicate = (product: Product) => {
+    let newName = `${product.name}-copy`;
+    if (newName.length > 30) {
+      newName = `${product.name.substring(0, 25)}-copy`;
+    }
     const newProduct: Product = {
       ...product,
       id: Math.random().toString(36).substr(2, 9),
-      name: `${product.name}-copy`
+      name: newName
     };
     onAddProduct(newProduct);
     setSwipeState(null);
@@ -626,7 +636,14 @@ const InventoryView: React.FC<InventoryViewProps> = ({
               
               <div>
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Product Name</label>
-                <input type="text" value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" placeholder="Product Title" />
+                <input 
+                  type="text" 
+                  value={editingProduct.name} 
+                  maxLength={30}
+                  onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} 
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" 
+                  placeholder="Product Title (Max 30 chars)" 
+                />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
