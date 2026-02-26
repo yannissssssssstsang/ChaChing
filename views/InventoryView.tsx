@@ -170,8 +170,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({
         data.forEach(row => {
           let name = String(row.Name || row['名稱'] || row.ProductName || '').trim();
           if (!name) return;
-          // Enforce 30 character limit
-          if (name.length > 30) name = name.substring(0, 30);
+          // Enforce 20 character limit
+          if (name.length > 20) name = name.substring(0, 20);
           
           const productData = {
             price: parseFloat(row.Price || row['價格'] || row['單價'] || 0),
@@ -205,7 +205,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
           onUpdateProduct({ ...matchedProduct, image: thumb });
         } else {
           let finalName = fileNameWithoutExt;
-          if (finalName.length > 30) finalName = finalName.substring(0, 30);
+          if (finalName.length > 20) finalName = finalName.substring(0, 20);
 
           onAddProduct({
             id: Math.random().toString(36).substr(2, 9),
@@ -279,8 +279,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({
 
   const handleDuplicate = (product: Product) => {
     let newName = `${product.name}-copy`;
-    if (newName.length > 30) {
-      newName = `${product.name.substring(0, 25)}-copy`;
+    if (newName.length > 20) {
+      newName = `${product.name.substring(0, 15)}-copy`;
     }
     const newProduct: Product = {
       ...product,
@@ -639,10 +639,10 @@ const InventoryView: React.FC<InventoryViewProps> = ({
                 <input 
                   type="text" 
                   value={editingProduct.name} 
-                  maxLength={30}
+                  maxLength={20}
                   onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} 
                   className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" 
-                  placeholder="Product Title (Max 30 chars)" 
+                  placeholder="Product Title (Max 20 chars)" 
                 />
               </div>
               

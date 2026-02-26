@@ -94,7 +94,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
     });
 
     return Object.values(summary)
-      .sort((a, b) => b.units - a.units)
+      .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 12); // Show more items in the redesigned grid
   }, [filteredTransactions, summaryMode, lang, products]);
 
@@ -302,6 +302,13 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
                   
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '收入' : 'Rev'}</p>
+                      <span className="text-sm font-black text-blue-600">
+                        ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
                       <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '數量' : 'Qty'}</p>
                       <div className="flex items-center gap-1.5">
                         <span className="text-sm font-black text-slate-800">{item.units}</span>
@@ -311,13 +318,6 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
                           </span>
                         )}
                       </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '收入' : 'Rev'}</p>
-                      <span className="text-sm font-black text-blue-600">
-                        ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-                      </span>
                     </div>
                   </div>
                 </div>
