@@ -231,18 +231,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         <div className="flex justify-between items-center">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Cloud Backup & Recovery</h3>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
-              <div className={`w-1.5 h-1.5 rounded-full ${
-                syncStatus === 'synced' ? 'bg-emerald-500' : 
-                syncStatus === 'syncing' ? 'bg-blue-500 animate-pulse' : 
-                syncStatus === 'offline' ? 'bg-amber-500' : 'bg-red-500'
-              }`}></div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                {syncStatus === 'synced' ? 'Synced' : 
-                 syncStatus === 'syncing' ? 'Syncing' : 
-                 syncStatus === 'offline' ? 'Offline' : 'Sync Error'}
-              </span>
-            </div>
             <button 
               onClick={handleManualDownload}
               disabled={isDownloading}

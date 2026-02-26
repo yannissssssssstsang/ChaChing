@@ -19,7 +19,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
   const [searchTerm, setSearchTerm] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
-  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   
   const [showReceiptChoice, setShowReceiptChoice] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -69,14 +69,29 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
 
   const availableProducts = useMemo(() => products.filter(p => !p.isExtracting), [products]);
 
+  const allCategories = useMemo(() => {
+    const cats = new Set<string>();
+    availableProducts.forEach(p => {
+      const cat = String(p.category || '').trim();
+      if (cat) cats.add(cat);
+    });
+    return ['All', ...Array.from(cats).sort()];
+  }, [availableProducts]);
+
   const filteredProducts = useMemo(() => {
-    if (!searchTerm.trim()) return availableProducts;
+    let result = availableProducts;
+    
+    if (selectedCategory !== 'All') {
+      result = result.filter(p => String(p.category || '').trim() === selectedCategory);
+    }
+
+    if (!searchTerm.trim()) return result;
     const lowerQuery = searchTerm.toLowerCase();
-    return availableProducts.filter(p => 
+    return result.filter(p => 
       p.name.toLowerCase().includes(lowerQuery) ||
       (p.category && p.category.toLowerCase().includes(lowerQuery))
     );
-  }, [availableProducts, searchTerm]);
+  }, [availableProducts, searchTerm, selectedCategory]);
 
   const availablePaymentMethods = useMemo(() => {
     const methods = ['CASH'];
@@ -237,17 +252,6 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
     setDiscountTargetIds([]);
   };
 
-  const groupedProducts = useMemo(() => {
-    return filteredProducts.reduce((acc, product) => {
-      const cat = String(product.category || '').trim() || (lang === Language.ZH ? '未分類' : 'Uncategorized');
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(product);
-      return acc;
-    }, {} as Record<string, Product[]>);
-  }, [filteredProducts, lang]);
-
-  const categories = useMemo(() => Object.keys(groupedProducts).sort(), [groupedProducts]);
-
   return (
     <div className="space-y-8 pb-32 md:pb-8">
       {/* Search Header */}
@@ -278,48 +282,48 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
         </div>
       </div>
 
-      {categories.length > 0 ? categories.map((category) => {
-        const catColor = (cat: string) => {
-          let hash = 0;
-          for (let i = 0; i < cat.length; i++) hash = cat.charCodeAt(i) + ((hash << 5) - hash);
-          const colors = ['bg-blue-50 text-blue-600 border-blue-100', 'bg-emerald-50 text-emerald-600 border-emerald-100', 'bg-purple-50 text-purple-600 border-purple-100', 'bg-amber-50 text-amber-600 border-amber-100', 'bg-rose-50 text-rose-600 border-rose-100'];
-          return colors[Math.abs(hash) % colors.length];
-        };
-        const colorClass = catColor(category);
-        return (
-          <div key={category} className="space-y-4">
-            <button onClick={() => setCollapsedCategories(prev => ({...prev, [category]: !prev[category]}))} className={`w-full flex justify-between items-center p-4 rounded-2xl border ${colorClass} shadow-sm`}>
-              <div className="flex items-center gap-3">
-                <i className="fas fa-layer-group text-xs opacity-50"></i>
-                <h2 className="text-xs font-black uppercase tracking-widest">{category}</h2>
-              </div>
-              <i className={`fas fa-chevron-down text-xs transition-transform ${collapsedCategories[category] ? '-rotate-90' : ''}`}></i>
+      {/* Category Tags */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        {allCategories.map((category) => {
+          const isActive = selectedCategory === category;
+          return (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border shadow-sm active:scale-95 ${
+                isActive 
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-blue-100' 
+                  : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200 hover:text-blue-500'
+              }`}
+            >
+              {category === 'All' ? (lang === Language.ZH ? '全部' : 'All') : category}
             </button>
-            {!collapsedCategories[category] && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 animate-scale-in origin-top">
-                {groupedProducts[category].map(product => {
-                  const qty = cart.find(i => i.id === product.id)?.quantity || 0;
-                  return (
-                    <button key={product.id} onClick={() => addToCart(product)} disabled={product.stock <= 0} className={`relative flex flex-col p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-left transition-all hover:shadow-md ${product.stock <= 0 ? 'opacity-50 grayscale' : ''}`}>
-                      {qty > 0 && <div className="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10">{qty}</div>}
-                      {showImages && (
-                        <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 overflow-hidden border border-slate-100">
-                          <img src={product.image || `https://picsum.photos/seed/${product.id}/400`} alt={product.name} className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <h3 className="font-bold text-sm text-slate-800 line-clamp-1 uppercase tracking-tight">{product.name}</h3>
-                      <div className="flex justify-between w-full items-center mt-1">
-                        <span className="text-blue-600 font-extrabold text-base">${product.price.toLocaleString()}</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${product.stock < (product.threshold || 5) ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'}`}>{product.stock.toLocaleString()}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      }) : (
+          );
+        })}
+      </div>
+
+      {filteredProducts.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 animate-scale-in origin-top">
+          {filteredProducts.map(product => {
+            const qty = cart.find(i => i.id === product.id)?.quantity || 0;
+            return (
+              <button key={product.id} onClick={() => addToCart(product)} disabled={product.stock <= 0} className={`relative flex flex-col p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-left transition-all hover:shadow-md ${product.stock <= 0 ? 'opacity-50 grayscale' : ''}`}>
+                {qty > 0 && <div className="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10">{qty}</div>}
+                {showImages && (
+                  <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 overflow-hidden border border-slate-100">
+                    <img src={product.image || `https://picsum.photos/seed/${product.id}/400`} alt={product.name} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <h3 className="font-bold text-sm text-slate-800 line-clamp-1 uppercase tracking-tight">{product.name}</h3>
+                <div className="flex justify-between w-full items-center mt-1">
+                  <span className="text-blue-600 font-extrabold text-base">${product.price.toLocaleString()}</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${product.stock < (product.threshold || 5) ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'}`}>{product.stock.toLocaleString()}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
         <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200">
           <i className="fas fa-search text-slate-200 text-5xl mb-4"></i>
           <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">No matching products</p>
