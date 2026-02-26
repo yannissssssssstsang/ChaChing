@@ -630,7 +630,17 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                   </div>
                 )}
 
-                <button onClick={() => setShowReceiptChoice(true)} disabled={!selectedPayment} className="w-full bg-emerald-600 text-white p-6 rounded-[24px] font-black uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all active:scale-[0.98]">
+                <button 
+                  onClick={() => {
+                    if (receiptConfig?.enabled) {
+                      setShowReceiptChoice(true);
+                    } else {
+                      finalizeTransaction(false);
+                    }
+                  }} 
+                  disabled={!selectedPayment} 
+                  className="w-full bg-emerald-600 text-white p-6 rounded-[24px] font-black uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all active:scale-[0.98]"
+                >
                   {t.confirmPayment}
                 </button>
               </div>
