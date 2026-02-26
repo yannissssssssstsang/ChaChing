@@ -335,16 +335,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Email Receipt Section */}
-      <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
+      <div className={`bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6 transition-all duration-300 ${!receiptConfig.enabled ? 'opacity-50 grayscale-[0.5]' : ''}`}>
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Email Receipt Customization</h3>
-          <div className="flex items-center gap-2">
-            <i className="fas fa-magic text-blue-500 text-[10px]"></i>
-            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">AI Extraction Ready</span>
+          <div>
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Email Receipt Customization</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <i className="fas fa-magic text-blue-500 text-[10px]"></i>
+              <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">AI Extraction Ready</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Enable Email Receipt</span>
+            <button 
+              onClick={() => onUpdateReceiptConfig({...receiptConfig, enabled: !receiptConfig.enabled})}
+              className={`w-12 h-6 rounded-full transition-all relative ${receiptConfig.enabled ? 'bg-blue-600' : 'bg-slate-200'}`}
+            >
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${receiptConfig.enabled ? 'right-1' : 'left-1'}`}></div>
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${!receiptConfig.enabled ? 'pointer-events-none' : ''}`}>
           <div className="space-y-4">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Company Assets</p>
             <div className="grid grid-cols-2 gap-4">

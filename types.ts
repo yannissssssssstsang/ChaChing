@@ -74,6 +74,7 @@ export interface Transaction {
 }
 
 export interface ReceiptConfig {
+  enabled: boolean;
   logo?: string;
   businessCard?: string;
   companyName: string;
