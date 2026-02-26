@@ -1,20 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
 }
 
 :root {
-    --primary-theme: #0088CC;
-    --primary-theme-hover: #0077BB;
-    --primary-theme-light: #EBF5FB;
-    --primary-theme-border: #AED6F1;
-    --primary-theme-shadow: rgba(0, 136, 204, 0.2);
+    --primary-theme: #000000;
+    --primary-theme-hover: #1a1a1a;
+    --primary-theme-light: #f4f4f5;
+    --primary-theme-border: #e4e4e7;
+    --primary-theme-shadow: rgba(0, 0, 0, 0.05);
 }
 
 body { 
     font-family: 'Inter', sans-serif; 
-    transition: background-color 0.3s ease; 
+    transition: background-color 0.3s ease;
+    background-color: #fafafa;
+    color: #18181b;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .glass {
+    background: rgba(9, 9, 11, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* THEME OVERRIDES */
