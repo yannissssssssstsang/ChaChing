@@ -41,6 +41,7 @@ const App: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(localStorage.getItem('stall_last_sync'));
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOfflineMode, setIsOfflineMode] = useState(localStorage.getItem('stall_offline_mode') === 'true');
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('stall_dark_mode') === 'true');
   const [isInitialCloudLoading, setIsInitialCloudLoading] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -281,6 +282,8 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('stall_telegram_config', JSON.stringify(telegramConfig)); }, [telegramConfig]);
   useEffect(() => { localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); }, [receiptConfig]);
   useEffect(() => { localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); }, [settlementConfig]);
+  useEffect(() => { localStorage.setItem('stall_offline_mode', String(isOfflineMode)); }, [isOfflineMode]);
+  useEffect(() => { localStorage.setItem('stall_dark_mode', String(isDarkMode)); }, [isDarkMode]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -363,8 +366,8 @@ const App: React.FC = () => {
   }, []);
 
   const handleCloudSync = useCallback(async () => {
-    if (!navigator.onLine || !isLoggedIn || !googleToken) {
-      setSyncStatus('offline');
+    if (!navigator.onLine || isOfflineMode || !isLoggedIn || !googleToken) {
+      setSyncStatus(isOfflineMode ? 'offline' : 'pending');
       return;
     }
     
@@ -396,11 +399,11 @@ const App: React.FC = () => {
       isInitialMount.current = false;
       return;
     }
-    if (!isLoggedIn || !isOnline) return;
+    if (!isLoggedIn || !isOnline || isOfflineMode) return;
 
     const timer = setTimeout(() => handleCloudSync(), 2000);
     return () => clearTimeout(timer);
-  }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, isOnline, handleCloudSync]);
+  }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, isOnline, isOfflineMode, handleCloudSync]);
 
   const handleCompleteSale = (tx: Transaction) => setTransactions(prev => [...prev, tx]);
   const handleUpdateStock = (productId: string, diff: number) => {
@@ -503,6 +506,15 @@ const App: React.FC = () => {
               onUpdateSettlementConfig={setSettlementConfig}
               onManualSettle={handleManualSettle}
               onTokenExpiry={handleTokenExpiry}
+              isOfflineMode={isOfflineMode}
+              onToggleOfflineMode={() => {
+                const newMode = !isOfflineMode;
+                setIsOfflineMode(newMode);
+                if (!newMode) {
+                  // Trigger sync when going online
+                  setTimeout(handleCloudSync, 500);
+                }
+              }}
             />
           } />
         </Routes>

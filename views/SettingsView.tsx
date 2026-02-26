@@ -23,6 +23,8 @@ interface SettingsViewProps {
   onUpdateSettlementConfig: (config: SettlementConfig) => void;
   onManualSettle: () => void;
   onTokenExpiry?: () => void;
+  isOfflineMode: boolean;
+  onToggleOfflineMode: () => void;
 }
 
 interface HKMethod {
@@ -81,7 +83,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   settlementConfig,
   onUpdateSettlementConfig,
   onManualSettle,
-  onTokenExpiry
+  onTokenExpiry,
+  isOfflineMode,
+  onToggleOfflineMode
 }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -237,14 +241,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             {isSyncing ? <i className="fas fa-sync fa-spin"></i> : <i className={`fas ${isSavedLocally ? 'fa-check' : 'fa-save'}`}></i>}
             {isSyncing ? 'Syncing...' : (isSavedLocally ? 'Saved & Synced' : 'Save & Sync All')}
           </button>
-          <button 
-            onClick={handleSaveAll}
-            disabled={isSyncing}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 ${isSavedLocally ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-          >
-            {isSyncing ? <i className="fas fa-sync fa-spin"></i> : <i className={`fas ${isSavedLocally ? 'fa-check' : 'fa-save'}`}></i>}
-            {isSyncing ? 'Syncing...' : (isSavedLocally ? 'Saved & Synced' : 'Save & Sync All')}
-          </button>
         </div>
       </div>
 
@@ -294,6 +290,28 @@ const SettingsView: React.FC<SettingsViewProps> = ({
              </p>
           </div>
           <div className={`w-2.5 h-2.5 rounded-full ${diagStatus?.ok ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`}></div>
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isOfflineMode ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
+              <i className={`fas ${isOfflineMode ? 'fa-plane' : 'fa-globe'}`}></i>
+            </div>
+            <div>
+              <p className="text-xs font-black text-slate-800 uppercase tracking-tight">
+                {isOfflineMode ? 'Offline Mode' : 'Online Mode'}
+              </p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                {isOfflineMode ? 'Local Storage Only' : 'Real-time Cloud Sync'}
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={onToggleOfflineMode}
+            className={`w-14 h-7 rounded-full transition-all relative ${isOfflineMode ? 'bg-amber-500' : 'bg-blue-600'}`}
+          >
+            <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-sm ${isOfflineMode ? 'right-1' : 'left-1'}`}></div>
+          </button>
         </div>
       </div>
 
