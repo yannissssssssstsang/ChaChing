@@ -259,11 +259,11 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
         </div>
         <div className="dashboard-card p-4 flex flex-col justify-between">
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Net Sales</p>
-          <p className="text-2xl font-black text-slate-800">{filteredTransactions.length}</p>
+          <p className="text-2xl font-black text-slate-800">{filteredTransactions.length.toLocaleString()}</p>
         </div>
         <div className="dashboard-card p-4 flex flex-col justify-between border-l-4 border-l-red-400">
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t.refundCount}</p>
-          <p className="text-2xl font-black text-red-600">{totalRefundCount}</p>
+          <p className="text-2xl font-black text-red-600">{totalRefundCount.toLocaleString()}</p>
         </div>
       </div>
 
@@ -311,10 +311,10 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
                     <div className="flex justify-between items-center">
                       <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{lang === Language.ZH ? '數量' : 'Qty'}</p>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-black text-slate-800">{item.units}</span>
+                        <span className="text-sm font-black text-slate-800">{item.units.toLocaleString()}</span>
                         {item.refundedUnits > 0 && (
                           <span className="text-[8px] font-bold text-red-400 bg-red-50 px-1 rounded">
-                            -{item.refundedUnits}
+                            -{item.refundedUnits.toLocaleString()}
                           </span>
                         )}
                       </div>
@@ -357,7 +357,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ transactions, lang, produ
               <div key={i} className="group relative">
                 <div className="flex justify-between items-end mb-1">
                   <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{item.name}</span>
-                  <span className="text-[9px] font-black text-blue-600">{item.count} Sold</span>
+                  <span className="text-[9px] font-black text-blue-600">{item.count.toLocaleString()} Sold</span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(item.count / Math.max(...bestSellers.map(b => b.count))) * 100}%` }}></div>

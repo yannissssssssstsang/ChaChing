@@ -491,8 +491,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1"><h3 className="font-black text-slate-800 text-sm truncate uppercase tracking-tight">{product.name || 'Unnamed Product'}</h3>{product.category && <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest ${getCategoryColor(product.category)}`}>{product.category}</span>}</div>
                 <div className="flex items-baseline gap-4">
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Price</span><span className="text-sm font-black text-blue-600">${product.price}</span></div>
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Stock</span><span className={`text-sm font-black ${product.stock < (product.threshold || 5) ? 'text-red-500' : 'text-slate-800'}`}>{product.stock}</span></div>
+                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Price</span><span className="text-sm font-black text-blue-600">${product.price.toLocaleString()}</span></div>
+                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Stock</span><span className={`text-sm font-black ${product.stock < (product.threshold || 5) ? 'text-red-500' : 'text-slate-800'}`}>{product.stock.toLocaleString()}</span></div>
                 </div>
               </div>
               <button onClick={(e) => { e.stopPropagation(); setEditingProduct(product); }} className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-colors"><i className="fas fa-edit text-xs"></i></button>

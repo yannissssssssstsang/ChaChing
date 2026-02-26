@@ -309,8 +309,8 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       )}
                       <h3 className="font-bold text-sm text-slate-800 line-clamp-1 uppercase tracking-tight">{product.name}</h3>
                       <div className="flex justify-between w-full items-center mt-1">
-                        <span className="text-blue-600 font-extrabold text-base">${product.price}</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${product.stock < (product.threshold || 5) ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'}`}>{product.stock}</span>
+                        <span className="text-blue-600 font-extrabold text-base">${product.price.toLocaleString()}</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${product.stock < (product.threshold || 5) ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'}`}>{product.stock.toLocaleString()}</span>
                       </div>
                     </button>
                   );
@@ -334,7 +334,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
               <span className="uppercase tracking-widest text-xs">{t.checkout}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xl">${cartTotal.toFixed(1)}</span>
+              <span className="text-xl">${cartTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               <i className="fas fa-arrow-right text-xs"></i>
             </div>
           </button>
@@ -358,11 +358,11 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                         <span className="text-sm font-black text-slate-800 uppercase tracking-tight truncate">{item.name}</span>
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] font-bold uppercase tracking-widest ${item.discountedPrice !== item.price ? 'text-slate-300 line-through' : 'text-slate-400'}`}>
-                            ${item.price}
+                            ${item.price.toLocaleString()}
                           </span>
                           {item.discountedPrice !== item.price && (
                             <span className={`text-[10px] font-black uppercase tracking-widest ${item.discountedPrice! < item.price ? 'text-emerald-500' : 'text-blue-500'}`}>
-                              ${item.discountedPrice?.toFixed(1)}
+                              ${item.discountedPrice?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                             </span>
                           )}
                         </div>
@@ -380,12 +380,12 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                    {discountAmount !== 0 && (
                      <div className="flex justify-between items-center">
                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t.originalTotal}</span>
-                       <span className="text-sm font-black text-slate-300 line-through">${originalTotal.toFixed(1)}</span>
+                       <span className="text-sm font-black text-slate-300 line-through">${originalTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                      </div>
                    )}
                    <div className="flex justify-between items-center">
                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.total}</span>
-                     <span className="text-3xl font-black text-blue-600">${cartTotal.toFixed(1)}</span>
+                     <span className="text-3xl font-black text-blue-600">${cartTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                    </div>
                    {discountAmount !== 0 && (
                      <div className="flex justify-between items-center">
@@ -393,7 +393,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                          {discountAmount > 0 ? t.discountAmount : (lang === Language.ZH ? '價格調整' : 'Adjustment')}
                        </span>
                        <span className={`text-sm font-black ${discountAmount > 0 ? 'text-emerald-500' : 'text-blue-500'}`}>
-                         {discountAmount > 0 ? '-' : '+'}${Math.abs(discountAmount).toFixed(1)}
+                         {discountAmount > 0 ? '-' : '+'}${Math.abs(discountAmount).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                        </span>
                      </div>
                    )}
@@ -581,7 +581,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
                           <span className="text-slate-400 font-bold">$</span>
-                          <span className="font-black text-slate-800 text-right min-w-[40px]">{totalReceived.toFixed(1)}</span>
+                          <span className="font-black text-slate-800 text-right min-w-[40px]">{totalReceived.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                         </div>
                         {receivedBills.length > 0 && (
                           <button 
@@ -610,7 +610,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                     <div className="flex justify-between items-center pt-2 border-t border-slate-200/50">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.changeDue}</span>
                       <span className={`text-xl font-black ${changeDue > 0 ? 'text-emerald-600' : 'text-slate-300'}`}>
-                        ${changeDue.toFixed(1)}
+                        ${changeDue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       </span>
                     </div>
                   </div>

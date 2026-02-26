@@ -183,7 +183,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                 <span className={`text-[9px] font-black uppercase tracking-widest opacity-60 ${getMethodText(method)}`}>{method}</span>
               </div>
               <div>
-                <p className={`text-xl font-black ${getMethodText(method)}`}>${amount.toFixed(1)}</p>
+                <p className={`text-xl font-black ${getMethodText(method)}`}>${amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Net Collected</p>
               </div>
             </div>
@@ -239,11 +239,11 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                   <div className="flex flex-col items-end">
                     {tx.discountAmount > 0 && !isFullyRefunded && (
                       <span className="text-[10px] font-black text-slate-300 line-through tracking-tight">
-                        ${tx.originalTotal.toFixed(1)}
+                        ${tx.originalTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       </span>
                     )}
                     <p className={`text-lg font-black ${isFullyRefunded ? 'text-slate-400 line-through' : 'text-blue-600'}`}>
-                      ${effectiveTotal.toFixed(1)}
+                      ${effectiveTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 justify-end">
@@ -263,7 +263,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                 {tx.discountAmount > 0 && (
                   <div className="flex justify-between items-center text-[9px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 mb-2">
                     <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : t.oneTimeOffer})</span>
-                    <span>-${tx.discountAmount.toFixed(1)}</span>
+                    <span>-${tx.discountAmount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                   </div>
                 )}
                 {tx.items.map((item, idx) => {
@@ -282,9 +282,9 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                         {refundedQty > 0 && <span className="text-[8px] text-red-400 font-black italic">(-{refundedQty} {t.refunded})</span>}
                       </div>
                       <span className={`font-black ${remainingQty <= 0 ? 'text-slate-300 line-through' : 'text-slate-400'}`}>
-                        ${((item.discountedPrice || item.price) * item.quantity).toFixed(1)}
+                        ${((item.discountedPrice || item.price) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                         {item.discountedPrice && item.discountedPrice < item.price && (
-                          <span className="ml-1 text-[8px] line-through opacity-50">${(item.price * item.quantity).toFixed(1)}</span>
+                          <span className="ml-1 text-[8px] line-through opacity-50">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                         )}
                       </span>
                     </div>
@@ -298,7 +298,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                   {tx.refunds.map(refund => (
                     <div key={refund.id} className="flex justify-between items-center text-[9px]">
                       <span className="text-red-600 font-bold">{refund.quantity}x {refund.itemName} - {refund.reason}</span>
-                      <span className="text-red-600 font-black">-${refund.amount.toFixed(1)}</span>
+                      <span className="text-red-600 font-black">-${refund.amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                     </div>
                   ))}
                 </div>
@@ -311,7 +311,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                 </div>
                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${isFullyRefunded ? 'bg-slate-100 border-slate-200 text-slate-400' : 'bg-emerald-50 text-emerald-600 border-emerald-100/50'}`}>
                   <i className="fas fa-chart-line text-[8px]"></i>
-                  <span className="font-black uppercase tracking-widest">{t.profit}: ${effectiveProfit.toFixed(1)}</span>
+                  <span className="font-black uppercase tracking-widest">{t.profit}: ${effectiveProfit.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 </div>
               </div>
             </div>
