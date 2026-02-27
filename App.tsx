@@ -41,6 +41,18 @@ const App: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(localStorage.getItem('stall_last_sync'));
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const [isOfflineMode, setIsOfflineMode] = useState(localStorage.getItem('stall_offline_mode') === 'true');
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('stall_dark_mode') === 'true');
   const [isInitialCloudLoading, setIsInitialCloudLoading] = useState(false);
@@ -61,25 +73,34 @@ const App: React.FC = () => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
 
   useEffect(() => {
-    const savedProducts = localStorage.getItem('stall_products');
-    const savedTransactions = localStorage.getItem('stall_transactions');
-    const savedReports = localStorage.getItem('stall_reports');
-    const savedQRs = localStorage.getItem('stall_payment_qrs');
-    const savedLogs = localStorage.getItem('stall_change_logs');
-    const savedTelegram = localStorage.getItem('stall_telegram_config');
-    const savedReceipt = localStorage.getItem('stall_receipt_config');
-    const savedSettlement = localStorage.getItem('stall_settlement_config');
+    try {
+      const savedProducts = localStorage.getItem('stall_products');
+      const savedTransactions = localStorage.getItem('stall_transactions');
+      const savedReports = localStorage.getItem('stall_reports');
+      const savedQRs = localStorage.getItem('stall_payment_qrs');
+      const savedLogs = localStorage.getItem('stall_change_logs');
+      const savedTelegram = localStorage.getItem('stall_telegram_config');
+      const savedReceipt = localStorage.getItem('stall_receipt_config');
+      const savedSettlement = localStorage.getItem('stall_settlement_config');
 
-    if (savedProducts) setProducts(JSON.parse(savedProducts));
-    else setProducts(INITIAL_PRODUCTS);
+      if (savedProducts) setProducts(JSON.parse(savedProducts));
+      else setProducts(INITIAL_PRODUCTS);
 
-    if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
-    if (savedReports) setReports(JSON.parse(savedReports));
-    if (savedQRs) setPaymentQRCodes(JSON.parse(savedQRs));
-    if (savedLogs) setChangeLogs(JSON.parse(savedLogs));
-    if (savedTelegram) setTelegramConfig(JSON.parse(savedTelegram));
-    if (savedReceipt) setReceiptConfig(JSON.parse(savedReceipt));
-    if (savedSettlement) setSettlementConfig(JSON.parse(savedSettlement));
+      if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
+      if (savedReports) setReports(JSON.parse(savedReports));
+      if (savedQRs) setPaymentQRCodes(JSON.parse(savedQRs));
+      if (savedLogs) setChangeLogs(JSON.parse(savedLogs));
+      if (savedTelegram) setTelegramConfig(JSON.parse(savedTelegram));
+      if (savedReceipt) setReceiptConfig(JSON.parse(savedReceipt));
+      if (savedSettlement) setSettlementConfig(JSON.parse(savedSettlement));
+    } catch (e) {
+      console.error("Failed to load data from local storage:", e);
+      // Fallback to initial products if loading fails
+      setProducts(INITIAL_PRODUCTS);
+    }
+    
+    // Mark as hydrated if we have local data, especially important for offline mode
+    isHydrated.current = true;
   }, []);
 
   const getLocalDateString = (date: Date) => {
@@ -273,15 +294,69 @@ const App: React.FC = () => {
     }
   }, [googleToken]);
 
-  useEffect(() => { localStorage.setItem('stall_lang', lang); }, [lang]);
-  useEffect(() => { localStorage.setItem('stall_products', JSON.stringify(products)); }, [products]);
-  useEffect(() => { localStorage.setItem('stall_transactions', JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem('stall_reports', JSON.stringify(reports)); }, [reports]);
-  useEffect(() => { localStorage.setItem('stall_change_logs', JSON.stringify(changeLogs)); }, [changeLogs]);
-  useEffect(() => { localStorage.setItem('stall_payment_qrs', JSON.stringify(paymentQRCodes)); }, [paymentQRCodes]);
-  useEffect(() => { localStorage.setItem('stall_telegram_config', JSON.stringify(telegramConfig)); }, [telegramConfig]);
-  useEffect(() => { localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); }, [receiptConfig]);
-  useEffect(() => { localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); }, [settlementConfig]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_lang', lang); 
+    } catch (e) {
+      console.error("Failed to save lang to local storage:", e);
+    }
+  }, [lang]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_products', JSON.stringify(products)); 
+    } catch (e) {
+      console.error("Failed to save products to local storage:", e);
+    }
+  }, [products]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_transactions', JSON.stringify(transactions)); 
+    } catch (e) {
+      console.error("Failed to save transactions to local storage:", e);
+    }
+  }, [transactions]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_reports', JSON.stringify(reports)); 
+    } catch (e) {
+      console.error("Failed to save reports to local storage:", e);
+    }
+  }, [reports]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_change_logs', JSON.stringify(changeLogs)); 
+    } catch (e) {
+      console.error("Failed to save change logs to local storage:", e);
+    }
+  }, [changeLogs]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_payment_qrs', JSON.stringify(paymentQRCodes)); 
+    } catch (e) {
+      console.error("Failed to save payment QRs to local storage:", e);
+    }
+  }, [paymentQRCodes]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_telegram_config', JSON.stringify(telegramConfig)); 
+    } catch (e) {
+      console.error("Failed to save telegram config to local storage:", e);
+    }
+  }, [telegramConfig]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); 
+    } catch (e) {
+      console.error("Failed to save receipt config to local storage:", e);
+    }
+  }, [receiptConfig]);
+  useEffect(() => { 
+    try {
+      localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); 
+    } catch (e) {
+      console.error("Failed to save settlement config to local storage:", e);
+    }
+  }, [settlementConfig]);
   useEffect(() => { localStorage.setItem('stall_offline_mode', String(isOfflineMode)); }, [isOfflineMode]);
   useEffect(() => { localStorage.setItem('stall_dark_mode', String(isDarkMode)); }, [isDarkMode]);
 
@@ -316,8 +391,8 @@ const App: React.FC = () => {
         setIsLoggingIn(false);
         localStorage.setItem('stall_logged_in', 'true');
         localStorage.setItem('google_access_token', accessToken);
-        // Clean up the hash and redirect to home route for HashRouter
-        window.history.replaceState(null, '', window.location.pathname + window.location.search + '#/');
+        // Clean up the hash to avoid confusion with HashRouter
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
       }
     }
 
@@ -405,7 +480,18 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, isOnline, isOfflineMode, handleCloudSync]);
 
-  const handleCompleteSale = (tx: Transaction) => setTransactions(prev => [...prev, tx]);
+  const handleCompleteSale = (tx: Transaction) => {
+    setTransactions(prev => {
+      const newTransactions = [...prev, tx];
+      try {
+        localStorage.setItem('stall_transactions', JSON.stringify(newTransactions));
+      } catch (e) {
+        console.error("Failed to save transaction to local storage:", e);
+        alert(lang === Language.ZH ? '本地存儲空間不足，無法保存交易！' : 'Local storage quota exceeded. Could not save transaction!');
+      }
+      return newTransactions;
+    });
+  };
   const handleUpdateStock = (productId: string, diff: number) => {
     setProducts(prev => prev.map(p => {
       if (p.id === productId) {

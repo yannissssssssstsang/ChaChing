@@ -383,43 +383,43 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-24 md:pb-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-8 pb-24 md:pb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div className="flex items-center gap-4">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.inventory}</h2>
-            <div className="flex items-center gap-3 mt-1">
-              <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-0.5 rounded-full shadow-sm">
-                <div className={`w-1.5 h-1.5 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500' : (syncStatus === 'syncing' ? 'bg-blue-500 sync-pulse' : 'bg-amber-500 animate-pulse')}`}></div>
-                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
+            <h2 className="text-3xl font-extrabold text-black tracking-tighter">{t.inventory}</h2>
+            <div className="flex items-center gap-3 mt-1.5">
+              <div className="flex items-center gap-2 bg-white border border-zinc-100 px-3 py-1 rounded-full shadow-sm">
+                <div className={`w-2 h-2 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500' : (syncStatus === 'syncing' ? 'bg-black animate-pulse' : 'bg-amber-500 animate-pulse')}`}></div>
+                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
                   {syncStatus === 'synced' ? 'Cloud Synced' : (syncStatus === 'syncing' ? 'Saving to Cloud' : 'Offline')}
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-3 w-full sm:w-auto">
           <button 
             onClick={() => setShowHistory(true)}
-            className="w-12 h-12 bg-white border border-slate-100 rounded-xl text-slate-400 flex items-center justify-center hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm active:scale-95"
+            className="w-12 h-12 bg-white border border-zinc-100 rounded-2xl text-zinc-400 flex items-center justify-center hover:text-black hover:bg-zinc-50 transition-all shadow-sm active:scale-95"
           >
             <i className="fas fa-clock-rotate-left"></i>
           </button>
-          <div className="relative flex-1 sm:w-64">
-            <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+          <div className="relative flex-1 sm:w-72">
+            <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 text-xs"></i>
             <input 
               type="text" 
               placeholder="Search items..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 rounded-xl text-sm font-bold outline-none focus:border-blue-500 shadow-sm" 
+              className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-100 rounded-2xl text-sm font-medium outline-none focus:border-black transition-all shadow-sm" 
             />
           </div>
           
           <div className="flex gap-1">
             <button 
               onClick={(e) => { e.stopPropagation(); setShowAddMenu(!showAddMenu); }}
-              className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-sm shadow-lg shadow-blue-100 flex items-center gap-2 active:scale-95 transition-all"
+              className="bg-black text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-black/10 flex items-center gap-2.5 active:scale-95 transition-all"
             >
               <i className={`fas ${showAddMenu ? 'fa-times' : 'fa-plus'}`}></i>
               <span className="hidden sm:inline">{showAddMenu ? 'Close' : 'Add Item'}</span>
@@ -429,176 +429,234 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       </div>
 
       {showAddMenu && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-scale-in" onClick={e => e.stopPropagation()}>
-          <button onClick={() => localInputRef.current?.click()} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
-            <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fas fa-laptop-code text-2xl"></i></div>
-            <div>
-              <p className="font-black text-slate-800 uppercase tracking-wider text-[11px] mb-1">Local Drive</p>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Excel (.xlsx) / Images</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-scale-in" onClick={e => e.stopPropagation()}>
+          <button onClick={() => localInputRef.current?.click()} className="flex flex-col items-center justify-center gap-5 p-10 bg-white border border-zinc-100 rounded-[40px] hover:bg-zinc-50 transition-all shadow-sm group">
+            <div className="w-16 h-16 bg-zinc-50 text-black rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm"><i className="fas fa-laptop-code text-2xl"></i></div>
+            <div className="text-center">
+              <p className="font-bold text-black uppercase tracking-widest text-[11px] mb-1.5">Local Drive</p>
+              <p className="text-[9px] text-zinc-400 font-semibold uppercase tracking-widest">Excel (.xlsx) / Images</p>
             </div>
           </button>
-          <button onClick={() => setShowDrivePicker(true)} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fab fa-google-drive text-2xl"></i></div>
-            <div>
-              <p className="font-black text-slate-800 uppercase tracking-wider text-[11px] mb-1">Google Drive</p>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Sheets / .xlsx / Images</p>
+          <button onClick={() => setShowDrivePicker(true)} className="flex flex-col items-center justify-center gap-5 p-10 bg-white border border-zinc-100 rounded-[40px] hover:bg-zinc-50 transition-all shadow-sm group">
+            <div className="w-16 h-16 bg-zinc-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm"><i className="fab fa-google-drive text-2xl"></i></div>
+            <div className="text-center">
+              <p className="font-bold text-black uppercase tracking-widest text-[11px] mb-1.5">Google Drive</p>
+              <p className="text-[9px] text-zinc-400 font-semibold uppercase tracking-widest">Sheets / .xlsx / Images</p>
             </div>
           </button>
-          <button onClick={() => { setEditingProduct({ id: Math.random().toString(36).substr(2, 9), name: '', price: 0, cost: 0, stock: 0, category: '' }); setShowAddMenu(false); }} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
-            <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fas fa-keyboard text-2xl"></i></div>
-            <div>
-              <p className="font-black text-slate-800 uppercase tracking-wider text-[11px] mb-1">Manual Entry</p>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Quick Single Item</p>
+          <button onClick={() => { setEditingProduct({ id: Math.random().toString(36).substr(2, 9), name: '', price: 0, cost: 0, stock: 0, category: '' }); setShowAddMenu(false); }} className="flex flex-col items-center justify-center gap-5 p-10 bg-white border border-zinc-100 rounded-[40px] hover:bg-zinc-50 transition-all shadow-sm group">
+            <div className="w-16 h-16 bg-zinc-50 text-amber-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm"><i className="fas fa-keyboard text-2xl"></i></div>
+            <div className="text-center">
+              <p className="font-bold text-black uppercase tracking-widest text-[11px] mb-1.5">Manual Entry</p>
+              <p className="text-[9px] text-zinc-400 font-semibold uppercase tracking-widest">Quick Single Item</p>
             </div>
           </button>
         </div>
       )}
 
       {isProcessing && (
-        <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl shadow-blue-100 animate-scale-in">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-3"><i className="fas fa-magic animate-pulse"></i><p className="font-black text-sm uppercase tracking-[0.2em]">{processingProgress.message}</p></div>
-            <span className="text-sm font-black">{Math.round((processingProgress.current / (processingProgress.total || 1)) * 100)}%</span>
+        <div className="bg-black p-8 rounded-[32px] text-white shadow-2xl shadow-black/10 animate-scale-in">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-4"><i className="fas fa-magic animate-pulse"></i><p className="font-bold text-sm uppercase tracking-[0.2em]">{processingProgress.message}</p></div>
+            <span className="text-sm font-bold">{Math.round((processingProgress.current / (processingProgress.total || 1)) * 100)}%</span>
           </div>
-          <div className="w-full bg-blue-500/50 h-2 rounded-full overflow-hidden"><div className="bg-white h-full transition-all duration-500" style={{ width: `${(processingProgress.current / (processingProgress.total || 1)) * 100}%` }}></div></div>
+          <div className="w-full bg-zinc-800 h-2.5 rounded-full overflow-hidden"><div className="bg-white h-full transition-all duration-500" style={{ width: `${(processingProgress.current / (processingProgress.total || 1)) * 100}%` }}></div></div>
         </div>
       )}
 
       <div className="space-y-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className={`relative overflow-hidden rounded-3xl bg-white border transition-all group ${selectedIds.includes(product.id) ? 'border-blue-500 ring-2 ring-blue-500/10' : 'border-slate-100 shadow-sm hover:shadow-md'}`} onClick={(e) => { e.stopPropagation(); if (swipeState?.id === product.id) setSwipeState(null); else toggleSelection(product.id); }} onTouchStart={handleTouchStart} onTouchMove={(e) => handleTouchMove(e, product.id)} onTouchEnd={handleTouchEnd}>
+          <div key={product.id} className={`relative overflow-hidden rounded-[28px] bg-white border transition-all group ${selectedIds.includes(product.id) ? 'border-black ring-4 ring-black/5' : 'border-zinc-100 shadow-sm hover:shadow-xl hover:border-zinc-200'}`} onClick={(e) => { e.stopPropagation(); if (swipeState?.id === product.id) setSwipeState(null); else toggleSelection(product.id); }} onTouchStart={handleTouchStart} onTouchMove={(e) => handleTouchMove(e, product.id)} onTouchEnd={handleTouchEnd}>
             {/* Delete Button (Right Side, swipe left) */}
             <div className={`absolute inset-y-0 right-0 w-24 bg-red-500 flex items-center justify-center transition-transform duration-300 ease-out ${swipeState?.id === product.id && swipeState.dir === 'left' ? 'translate-x-0' : 'translate-x-full'}`}>
-              <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }} className="text-white flex flex-col items-center gap-1 w-full h-full justify-center active:bg-red-600 transition-colors">
+              <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }} className="text-white flex flex-col items-center gap-1.5 w-full h-full justify-center active:bg-red-600 transition-colors">
                 <i className="fas fa-trash-can text-sm"></i>
-                <span className="text-[9px] font-black uppercase tracking-widest">Delete</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest">Delete</span>
               </button>
             </div>
 
             {/* Duplicate Button (Left Side, swipe right) */}
-            <div className={`absolute inset-y-0 left-0 w-24 bg-blue-600 flex items-center justify-center transition-transform duration-300 ease-out ${swipeState?.id === product.id && swipeState.dir === 'right' ? 'translate-x-0' : '-translate-x-full'}`}>
-              <button onClick={(e) => { e.stopPropagation(); handleDuplicate(product); }} className="text-white flex flex-col items-center gap-1 w-full h-full justify-center active:bg-blue-700 transition-colors">
+            <div className={`absolute inset-y-0 left-0 w-24 bg-black flex items-center justify-center transition-transform duration-300 ease-out ${swipeState?.id === product.id && swipeState.dir === 'right' ? 'translate-x-0' : '-translate-x-full'}`}>
+              <button onClick={(e) => { e.stopPropagation(); handleDuplicate(product); }} className="text-white flex flex-col items-center gap-1.5 w-full h-full justify-center active:bg-zinc-800 transition-colors">
                 <i className="fas fa-copy text-sm"></i>
-                <span className="text-[9px] font-black uppercase tracking-widest">Copy</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest">Copy</span>
               </button>
             </div>
 
-            <div className={`flex items-center gap-4 p-4 transition-transform duration-300 ease-out ${swipeState?.id === product.id ? (swipeState.dir === 'left' ? '-translate-x-24' : 'translate-x-24') : 'translate-x-0'}`}>
+            <div className={`flex items-center gap-5 p-5 transition-transform duration-300 ease-out ${swipeState?.id === product.id ? (swipeState.dir === 'left' ? '-translate-x-24' : 'translate-x-24') : 'translate-x-0'}`}>
               <div className="relative shrink-0">
-                <div className="w-16 h-16 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden relative"><img src={product.image || `https://picsum.photos/seed/${product.id}/200`} alt={product.name} className="w-full h-full object-cover" /></div>
-                {selectedIds.includes(product.id) && <div className="absolute -top-1 -left-1 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm z-10 animate-scale-in"><i className="fas fa-check text-[10px]"></i></div>}
+                <div className="w-20 h-20 bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden relative"><img src={product.image || `https://picsum.photos/seed/${product.id}/200`} alt={product.name} className="w-full h-full object-cover" /></div>
+                {selectedIds.includes(product.id) && <div className="absolute -top-2 -left-2 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center border-2 border-white shadow-xl z-10 animate-scale-in"><i className="fas fa-check text-[10px]"></i></div>}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1"><h3 className="font-black text-slate-800 text-sm truncate uppercase tracking-tight">{product.name || 'Unnamed Product'}</h3>{product.category && <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest ${getCategoryColor(product.category)}`}>{product.category}</span>}</div>
-                <div className="flex items-baseline gap-4">
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Price</span><span className="text-sm font-black text-blue-600">${product.price.toLocaleString()}</span></div>
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Stock</span><span className={`text-sm font-black ${product.stock < (product.threshold || 5) ? 'text-red-500' : 'text-slate-800'}`}>{product.stock.toLocaleString()}</span></div>
+                <div className="flex items-center gap-3 mb-1.5"><h3 className="font-bold text-zinc-800 text-base truncate uppercase tracking-tight">{product.name || 'Unnamed Product'}</h3>{product.category && <span className={`text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest bg-zinc-100 text-zinc-500 border border-zinc-200`}>{product.category}</span>}</div>
+                <div className="flex items-baseline gap-6">
+                  <div className="flex flex-col"><span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">Price</span><span className="text-base font-extrabold text-black">${product.price.toLocaleString()}</span></div>
+                  <div className="flex flex-col"><span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">Stock</span><span className={`text-base font-extrabold ${product.stock < (product.threshold || 5) ? 'text-red-500' : 'text-zinc-800'}`}>{product.stock.toLocaleString()}</span></div>
                 </div>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); setEditingProduct(product); }} className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-colors"><i className="fas fa-edit text-xs"></i></button>
+              <button onClick={(e) => { e.stopPropagation(); setEditingProduct(product); }} className="w-12 h-12 bg-zinc-50 text-zinc-400 rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95"><i className="fas fa-edit text-xs"></i></button>
             </div>
           </div>
         ))}
         {filteredProducts.length === 0 && (
-          <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200"><i className="fas fa-boxes-stacked text-slate-200 text-5xl mb-4"></i><p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">Inventory Empty</p></div>
+          <div className="text-center py-24 bg-white rounded-[48px] border border-dashed border-zinc-200"><i className="fas fa-boxes-stacked text-zinc-200 text-6xl mb-5"></i><p className="text-zinc-400 font-bold uppercase tracking-[0.2em] text-xs">Inventory Empty</p></div>
         )}
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-20 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-[450px] z-[100] animate-scale-in">
-          <div className="bg-slate-900 text-white p-4 rounded-[32px] shadow-2xl flex justify-between items-center gap-3">
-            <div className="flex items-center gap-3 shrink-0">
-              <span className="bg-blue-600 w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black shadow-lg shadow-blue-500/20">{selectedIds.length}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Selected</span>
+        <div className="fixed bottom-24 md:bottom-10 left-6 right-6 md:left-auto md:right-10 md:w-[480px] z-[100] animate-scale-in">
+          <div className="glass p-5 rounded-[32px] shadow-2xl flex justify-between items-center gap-4 border border-white/50">
+            <div className="flex items-center gap-4 shrink-0">
+              <span className="bg-black text-white w-10 h-10 rounded-2xl flex items-center justify-center text-[12px] font-bold shadow-xl shadow-black/10">{selectedIds.length}</span>
+              <span className="text-[11px] font-black uppercase tracking-widest hidden sm:inline text-black">Selected Items</span>
             </div>
-            <div className="flex items-center gap-2 flex-1 justify-end">
-              <button onClick={() => setShowBatchModal(true)} className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Stock</button>
-              <button onClick={() => setSelectedIds([])} className="w-10 h-10 bg-slate-800 text-slate-400 rounded-xl flex items-center justify-center hover:text-white transition-colors"><i className="fas fa-times text-xs"></i></button>
+            <div className="flex items-center gap-3 flex-1 justify-end">
+              <button onClick={() => setShowBatchModal(true)} className="bg-black text-white px-6 py-3 rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-black/10 active:scale-95 transition-all">Update Stock</button>
+              <button onClick={() => setSelectedIds([])} className="w-12 h-12 bg-white/50 text-zinc-400 rounded-2xl flex items-center justify-center hover:text-black transition-colors border border-white/50"><i className="fas fa-times text-xs"></i></button>
             </div>
           </div>
         </div>
       )}
 
+
       {/* Confirmation Modal */}
       {confirmModal.show && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[300] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-scale-in">
-            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[300] flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-sm rounded-[40px] p-10 shadow-2xl animate-scale-in border border-zinc-100">
+            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8 text-3xl">
               <i className="fas fa-triangle-exclamation"></i>
             </div>
-            <h3 className="text-xl font-black text-slate-800 text-center uppercase tracking-tight mb-2">
+            <h3 className="text-2xl font-extrabold text-black text-center tracking-tighter mb-3">
               Delete Selected?
             </h3>
-            <p className="text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-8">
+            <p className="text-center text-[12px] font-bold text-zinc-400 uppercase tracking-widest leading-relaxed mb-10">
               Are you sure you want to delete {confirmModal.targetIds?.length} products?
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => setConfirmModal({ ...confirmModal, show: false })} className="p-5 bg-slate-100 text-slate-500 rounded-[24px] font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all">Cancel</button>
-              <button onClick={handleConfirmAction} className="p-5 bg-red-600 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all shadow-xl shadow-red-100">Confirm</button>
+              <button onClick={() => setConfirmModal({ ...confirmModal, show: false })} className="p-5 bg-zinc-100 text-zinc-500 rounded-[24px] font-bold uppercase tracking-widest text-[11px] active:scale-95 transition-all">Cancel</button>
+              <button onClick={handleConfirmAction} className="p-5 bg-red-600 text-white rounded-[24px] font-bold uppercase tracking-widest text-[11px] active:scale-95 transition-all shadow-xl shadow-red-100">Confirm</button>
             </div>
           </div>
         </div>
       )}
 
       {showBatchModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setShowBatchModal(false)}>
-          <div className="bg-white w-full max-sm rounded-[40px] p-8 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6"><div><h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Batch Stock</h3><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Updating {selectedIds.length} items</p></div><button onClick={() => setShowBatchModal(false)} className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><i className="fas fa-times"></i></button></div>
-            <div className="space-y-6">
-              <div className="text-center"><p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Enter quantity to adjust</p><div className="flex items-center justify-center gap-4"><button onClick={() => setBatchAmount(prev => String((parseInt(prev) || 0) - 1))} className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 active:scale-90 transition-all"><i className="fas fa-minus"></i></button><input type="number" value={batchAmount} onChange={e => setBatchAmount(e.target.value)} className="w-24 p-4 bg-slate-50 border border-slate-100 rounded-[20px] text-center text-xl font-black text-blue-600 outline-none focus:border-blue-500 shadow-inner" /><button onClick={() => setBatchAmount(prev => String((parseInt(prev) || 0) + 1))} className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 active:scale-90 transition-all"><i className="fas fa-plus"></i></button></div></div>
-              <button onClick={handlePerformBatchUpdate} className="w-full bg-blue-600 text-white p-5 rounded-[24px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-100 transition-all active:scale-[0.98]">Process Batch</button>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[200] flex items-center justify-center p-6" onClick={() => setShowBatchModal(false)}>
+          <div className="bg-white w-full max-w-sm rounded-[48px] p-10 shadow-2xl animate-scale-in border border-zinc-100" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="text-2xl font-extrabold text-black tracking-tighter">Batch Stock</h3>
+                <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Updating {selectedIds.length} items</p>
+              </div>
+              <button onClick={() => setShowBatchModal(false)} className="w-12 h-12 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-400 hover:text-black transition-colors"><i className="fas fa-times"></i></button>
+            </div>
+            <div className="space-y-8">
+              <div className="text-center">
+                <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mb-6">Enter quantity to adjust</p>
+                <div className="flex items-center justify-center gap-6">
+                  <button onClick={() => setBatchAmount(prev => String((parseInt(prev) || 0) - 1))} className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-400 active:scale-90 transition-all hover:bg-zinc-100"><i className="fas fa-minus"></i></button>
+                  <input type="number" value={batchAmount} onChange={e => setBatchAmount(e.target.value)} className="w-28 p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] text-center text-2xl font-extrabold text-black outline-none focus:border-black shadow-inner transition-all" />
+                  <button onClick={() => setBatchAmount(prev => String((parseInt(prev) || 0) + 1))} className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center text-black active:scale-90 transition-all hover:bg-zinc-100"><i className="fas fa-plus"></i></button>
+                </div>
+              </div>
+              <button onClick={handlePerformBatchUpdate} className="w-full bg-black text-white p-6 rounded-[28px] font-bold uppercase tracking-[0.2em] shadow-xl shadow-black/10 transition-all active:scale-[0.98]">Process Batch</button>
             </div>
           </div>
         </div>
       )}
 
       {showDrivePicker && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setShowDrivePicker(false)}>
-          <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col animate-scale-in max-h-[85vh]" onClick={e => e.stopPropagation()}>
-            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-emerald-50/30"><div><h3 className="text-xl font-black text-slate-800 flex items-center gap-3"><i className="fab fa-google-drive text-emerald-600"></i>Cloud Picker</h3><div className="flex items-center gap-2 mt-1"><div className={`w-1.5 h-1.5 rounded-full ${tokenStatus.active ? 'bg-emerald-500' : 'bg-red-500'}`}></div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{tokenStatus.label}</p></div></div><button onClick={() => setShowDrivePicker(false)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm"><i className="fas fa-times"></i></button></div>
-            <div className="flex-1 overflow-y-auto p-8">
-              {isLoadingDrive ? <div className="flex flex-col items-center justify-center py-20 gap-4"><i className="fas fa-spinner fa-spin text-3xl text-emerald-600"></i><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Querying Drive...</p></div> : driveError ? <div className="text-center py-20 bg-red-50 rounded-3xl p-8"><i className="fas fa-triangle-exclamation text-3xl text-red-500 mb-4"></i><p className="font-black text-red-700 uppercase tracking-widest text-xs">Drive Access Error</p><button onClick={loadDriveFiles} className="mt-6 px-6 py-2 bg-white text-red-600 text-[10px] font-black uppercase rounded-xl">Retry Access</button></div> : driveFiles.length > 0 ? <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">{driveFiles.map(file => <button key={file.id} onClick={() => setSelectedDriveIds(prev => prev.includes(file.id) ? prev.filter(x => x !== file.id) : [...prev, file.id])} className={`relative p-3 rounded-3xl border-2 transition-all ${selectedDriveIds.includes(file.id) ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100 hover:border-slate-200'}`}><div className="aspect-square bg-slate-50 rounded-2xl mb-2 flex items-center justify-center relative overflow-hidden">{file.thumbnailLink ? <img src={file.thumbnailLink.replace('=s220', '=s400')} className="w-full h-full object-cover" /> : <i className={`fas ${getFileIcon(file)} text-3xl opacity-40`}></i>}{selectedDriveIds.includes(file.id) && <div className="absolute inset-0 bg-emerald-600/20 flex items-center justify-center"><i className="fas fa-check-circle text-white text-3xl"></i></div>}</div><p className="text-[10px] font-black text-slate-600 uppercase tracking-tighter truncate">{file.name}</p></button>)}</div> : <div className="text-center py-20 opacity-30"><i className="fas fa-cloud-moon text-5xl mb-4"></i><p className="font-black uppercase tracking-widest text-xs">No matching files</p></div>}
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[200] flex items-center justify-center p-6" onClick={() => setShowDrivePicker(false)}>
+          <div className="bg-white w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden flex flex-col animate-scale-in max-h-[85vh] border border-zinc-100" onClick={e => e.stopPropagation()}>
+            <div className="p-10 border-b border-zinc-50 flex justify-between items-center bg-zinc-50/50">
+              <div>
+                <h3 className="text-2xl font-extrabold text-black flex items-center gap-4 tracking-tighter"><i className="fab fa-google-drive text-emerald-600"></i>Cloud Picker</h3>
+                <div className="flex items-center gap-2.5 mt-2">
+                  <div className={`w-2 h-2 rounded-full ${tokenStatus.active ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                  <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-widest">{tokenStatus.label}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowDrivePicker(false)} className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-zinc-400 shadow-sm hover:text-black transition-colors border border-zinc-100"><i className="fas fa-times"></i></button>
             </div>
-            <div className="p-8 bg-slate-50"><button onClick={handleImportFromDrive} disabled={selectedDriveIds.length === 0 || isLoadingDrive || !!driveError} className="w-full bg-emerald-600 text-white p-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-100 disabled:opacity-50 active:scale-[0.98]">Import Selected ({selectedDriveIds.length})</button></div>
+            <div className="flex-1 overflow-y-auto p-10">
+              {isLoadingDrive ? (
+                <div className="flex flex-col items-center justify-center py-24 gap-5">
+                  <i className="fas fa-spinner fa-spin text-4xl text-black"></i>
+                  <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Querying Drive...</p>
+                </div>
+              ) : driveError ? (
+                <div className="text-center py-24 bg-red-50 rounded-[40px] p-10">
+                  <i className="fas fa-triangle-exclamation text-4xl text-red-500 mb-6"></i>
+                  <p className="font-bold text-red-700 uppercase tracking-widest text-xs">Drive Access Error</p>
+                  <button onClick={loadDriveFiles} className="mt-8 px-8 py-3 bg-white text-red-600 text-[11px] font-bold uppercase rounded-2xl shadow-sm hover:bg-red-50 transition-colors">Retry Access</button>
+                </div>
+              ) : driveFiles.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+                  {driveFiles.map(file => (
+                    <button key={file.id} onClick={() => setSelectedDriveIds(prev => prev.includes(file.id) ? prev.filter(x => x !== file.id) : [...prev, file.id])} className={`relative p-4 rounded-[32px] border-2 transition-all ${selectedDriveIds.includes(file.id) ? 'border-black bg-zinc-50' : 'border-zinc-100 hover:border-zinc-200'}`}>
+                      <div className="aspect-square bg-zinc-100 rounded-[24px] mb-3 flex items-center justify-center relative overflow-hidden">
+                        {file.thumbnailLink ? <img src={file.thumbnailLink.replace('=s220', '=s400')} className="w-full h-full object-cover" /> : <i className={`fas ${getFileIcon(file)} text-4xl opacity-20`}></i>}
+                        {selectedDriveIds.includes(file.id) && <div className="absolute inset-0 bg-black/10 flex items-center justify-center"><i className="fas fa-check-circle text-black text-4xl"></i></div>}
+                      </div>
+                      <p className="text-[11px] font-bold text-zinc-600 uppercase tracking-tight truncate px-1">{file.name}</p>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-24 opacity-20">
+                  <i className="fas fa-cloud-moon text-6xl mb-6"></i>
+                  <p className="font-bold uppercase tracking-widest text-xs">No matching files</p>
+                </div>
+              )}
+            </div>
+            <div className="p-10 bg-zinc-50/50 border-t border-zinc-100">
+              <button onClick={handleImportFromDrive} disabled={selectedDriveIds.length === 0 || isLoadingDrive || !!driveError} className="w-full bg-black text-white p-6 rounded-[28px] font-bold uppercase tracking-[0.2em] shadow-2xl shadow-black/10 disabled:opacity-30 active:scale-[0.98] transition-all">
+                Import Selected ({selectedDriveIds.length})
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {showHistory && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-end md:items-center justify-center p-4" onClick={() => setShowHistory(false)}>
-          <div className="bg-white w-full max-w-lg rounded-[48px] p-8 shadow-2xl animate-scale-in max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6 shrink-0"><h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Inventory History</h3><button onClick={() => setShowHistory(false)} className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><i className="fas fa-times"></i></button></div>
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[200] flex items-end md:items-center justify-center p-6" onClick={() => setShowHistory(false)}>
+          <div className="bg-white w-full max-w-lg rounded-[48px] p-10 shadow-2xl animate-scale-in max-h-[85vh] flex flex-col border border-zinc-100" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8 shrink-0">
+              <h3 className="text-2xl font-extrabold text-black tracking-tighter">Inventory History</h3>
+              <button onClick={() => setShowHistory(false)} className="w-12 h-12 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-400 hover:text-black transition-colors"><i className="fas fa-times"></i></button>
+            </div>
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
               {changeLogs.length > 0 ? changeLogs.map(log => (
-                <div key={log.id} className="p-4 bg-slate-50 border border-slate-100 rounded-3xl flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${getLogColor(log)}`}>
-                    <i className={`fas ${getLogIcon(log.field)} text-xs`}></i>
+                <div key={log.id} className="p-5 bg-zinc-50 border border-zinc-100 rounded-[32px] flex items-start gap-5">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-white border border-zinc-100 shadow-sm`}>
+                    <i className={`fas ${getLogIcon(log.field)} text-xs text-zinc-400`}></i>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <p className="text-sm font-black text-slate-800 truncate uppercase tracking-tight">{log.productName}</p>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase ml-2 whitespace-nowrap">
+                    <div className="flex justify-between items-start mb-1.5">
+                      <p className="text-sm font-bold text-black truncate uppercase tracking-tight">{log.productName}</p>
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase ml-3 whitespace-nowrap">
                         {formatLogTimestamp(log.timestamp)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
                         {log.field === 'status' ? (log.newValue === 'created' ? 'Created' : 'Deleted') : log.field.replace('_', ' ')}
                       </span>
                       {log.field !== 'status' && (
-                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-2 py-0.5 rounded-lg">
-                          <span className="text-[10px] font-bold text-slate-400">{log.oldValue}</span>
-                          <i className="fas fa-arrow-right text-[8px] text-slate-300"></i>
-                          <span className={`text-[10px] font-black ${Number(log.newValue) > Number(log.oldValue) ? 'text-emerald-500' : 'text-red-500'}`}>{log.newValue}</span>
+                        <div className="flex items-center gap-2 bg-white border border-zinc-200 px-3 py-1 rounded-xl shadow-sm">
+                          <span className="text-[11px] font-bold text-zinc-400">{log.oldValue}</span>
+                          <i className="fas fa-arrow-right text-[9px] text-zinc-300"></i>
+                          <span className={`text-[11px] font-extrabold ${Number(log.newValue) > Number(log.oldValue) ? 'text-emerald-500' : 'text-red-500'}`}>{log.newValue}</span>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
               )) : (
-                <div className="text-center py-20 opacity-30">
-                  <i className="fas fa-clock-rotate-left text-5xl mb-4"></i>
-                  <p className="font-black uppercase tracking-widest text-xs">No edit history</p>
+                <div className="text-center py-24 opacity-20">
+                  <i className="fas fa-clock-rotate-left text-6xl mb-6"></i>
+                  <p className="font-bold uppercase tracking-widest text-xs">No edit history</p>
                 </div>
               )}
             </div>
@@ -607,87 +665,87 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       )}
 
       {editingProduct && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-end md:items-center justify-center p-4" onClick={() => setEditingProduct(null)}>
-          <div className="bg-white w-full max-w-lg rounded-[48px] p-8 shadow-2xl animate-scale-in max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[200] flex items-end md:items-center justify-center p-6" onClick={() => setEditingProduct(null)}>
+          <div className="bg-white w-full max-w-lg rounded-[56px] p-10 shadow-2xl animate-scale-in max-h-[95vh] overflow-y-auto border border-zinc-100" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-2xl font-extrabold text-black tracking-tighter">
                 {products.some(p => p.id === editingProduct.id) ? 'Edit Item' : 'Manual Entry'}
               </h3>
-              <button onClick={() => setEditingProduct(null)} className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><i className="fas fa-times"></i></button>
+              <button onClick={() => setEditingProduct(null)} className="w-12 h-12 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-400 hover:text-black transition-colors"><i className="fas fa-times"></i></button>
             </div>
             
-            <div className="space-y-5">
-              <div className="w-full aspect-video bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group" onClick={() => manualImageInputRef.current?.click()}>
+            <div className="space-y-6">
+              <div className="w-full aspect-video bg-zinc-50 rounded-[40px] border-2 border-dashed border-zinc-200 flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group transition-all hover:bg-zinc-100 hover:border-zinc-300" onClick={() => manualImageInputRef.current?.click()}>
                 {editingProduct.image ? (
                   <>
                     <img src={editingProduct.image} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-black uppercase tracking-widest">Update Photo</span>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                      <span className="text-white text-[11px] font-bold uppercase tracking-widest">Update Photo</span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm mb-3"><i className="fas fa-camera text-xl"></i></div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tap to add photo</p>
+                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-zinc-300 shadow-sm mb-4"><i className="fas fa-camera text-2xl"></i></div>
+                    <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Tap to add photo</p>
                   </>
                 )}
               </div>
               <input type="file" ref={manualImageInputRef} onChange={handleManualImageUpload} className="hidden" accept="image/*" />
               
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Product Name</label>
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-2.5 block">Product Name</label>
                 <input 
                   type="text" 
                   value={editingProduct.name} 
                   maxLength={20}
                   onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} 
-                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" 
+                  className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] font-bold outline-none focus:border-black shadow-sm transition-all" 
                   placeholder="Product Title (Max 20 chars)" 
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Sell Price ($)</label>
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-2.5 block">Sell Price ($)</label>
                   <input 
                     type="number" 
                     value={editingProduct.price === 0 ? '' : editingProduct.price} 
                     placeholder="0"
                     onChange={e => setEditingProduct({...editingProduct, price: e.target.value === '' ? 0 : parseFloat(e.target.value)})} 
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm text-blue-600" 
+                    className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] font-bold outline-none focus:border-black shadow-sm transition-all text-black" 
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Cost Price ($)</label>
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-2.5 block">Cost Price ($)</label>
                   <input 
                     type="number" 
                     value={editingProduct.cost === 0 ? '' : editingProduct.cost} 
                     placeholder="0"
                     onChange={e => setEditingProduct({...editingProduct, cost: e.target.value === '' ? 0 : parseFloat(e.target.value)})} 
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm text-slate-500" 
+                    className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] font-bold outline-none focus:border-black shadow-sm transition-all text-zinc-500" 
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Available Stock</label>
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-2.5 block">Available Stock</label>
                   <input 
                     type="number" 
                     value={editingProduct.stock === 0 ? '' : editingProduct.stock} 
                     placeholder="0"
                     onChange={e => setEditingProduct({...editingProduct, stock: e.target.value === '' ? 0 : parseInt(e.target.value)})} 
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" 
+                    className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] font-bold outline-none focus:border-black shadow-sm transition-all" 
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Category</label>
-                  <input list="cat-list" type="text" value={editingProduct.category} onChange={e => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[20px] font-bold outline-none focus:border-blue-500 shadow-sm" />
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-2.5 block">Category</label>
+                  <input list="cat-list" type="text" value={editingProduct.category} onChange={e => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] font-bold outline-none focus:border-black shadow-sm transition-all" />
                   <datalist id="cat-list">{uniqueCategories.map(c => <option key={c} value={c} />)}</datalist>
                 </div>
               </div>
               
-              <div className="pt-2">
+              <div className="pt-4">
                 <button 
                   onClick={() => { 
                     if (products.find(p => p.id === editingProduct.id)) onUpdateProduct(editingProduct); 
@@ -695,7 +753,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
                     setEditingProduct(null); 
                   }} 
                   disabled={!editingProduct.name} 
-                  className="w-full bg-blue-600 text-white p-5 rounded-[24px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-100 active:scale-95 transition-all"
+                  className="w-full bg-black text-white p-6 rounded-[28px] font-bold uppercase tracking-[0.2em] shadow-2xl shadow-black/10 active:scale-95 transition-all disabled:opacity-30"
                 >
                   Save Item
                 </button>
@@ -703,16 +761,16 @@ const InventoryView: React.FC<InventoryViewProps> = ({
 
               {/* Redesigned Individual Delete Button */}
               {products.some(p => p.id === editingProduct.id) && (
-                <div className="mt-8 pt-6 border-t border-slate-50">
-                  <div className="flex items-center gap-3 mb-4 opacity-50 px-1">
+                <div className="mt-10 pt-8 border-t border-zinc-100">
+                  <div className="flex items-center gap-3 mb-5 opacity-40 px-1">
                     <i className="fas fa-shield-halved text-[10px] text-red-500"></i>
-                    <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.3em]">Danger Zone</p>
+                    <p className="text-[10px] font-bold text-red-500 uppercase tracking-[0.3em]">Danger Zone</p>
                   </div>
                   <button 
                     onClick={() => {
                       setConfirmModal({ show: true, type: 'batch_delete', targetIds: [editingProduct.id] });
                     }}
-                    className="w-full py-4 bg-white text-red-500 border border-red-100 rounded-[24px] font-black uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-3 shadow-sm hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-[0.98]"
+                    className="w-full py-5 bg-white text-red-500 border border-red-100 rounded-[28px] font-bold uppercase tracking-[0.15em] text-[11px] flex items-center justify-center gap-4 shadow-sm hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-[0.98]"
                   >
                     <i className="fas fa-trash-can"></i>
                     Remove from Inventory
@@ -723,6 +781,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
           </div>
         </div>
       )}
+
       <input type="file" ref={localInputRef} onChange={handleLocalUpload} className="hidden" multiple accept=".xlsx,image/*" />
     </div>
   );
