@@ -69,8 +69,8 @@ const Layout: React.FC<LayoutProps> = ({
 
         <div className={`pt-6 border-t space-y-3 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           {/* Sidebar Dark Mode Toggle */}
-          <button 
-            onClick={onToggleDarkMode}
+          <button
+            onClick={() => onToggleDarkMode && onToggleDarkMode()}
             className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'}`}
           >
             <div className="flex items-center gap-3">
@@ -122,8 +122,8 @@ const Layout: React.FC<LayoutProps> = ({
            )}
         </div>
         <div className="flex items-center gap-2">
-          <button 
-            onClick={onToggleDarkMode}
+          <button
+            onClick={() => onToggleDarkMode && onToggleDarkMode()}
             className={`w-12 h-10 rounded-xl flex flex-col items-center justify-center transition-all border ${isDarkMode ? 'bg-slate-800 text-blue-400 border-slate-700' : 'bg-white/20 text-white border-transparent'}`}
           >
             <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-[10px]`}></i>
