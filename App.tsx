@@ -316,8 +316,8 @@ const App: React.FC = () => {
         setIsLoggingIn(false);
         localStorage.setItem('stall_logged_in', 'true');
         localStorage.setItem('google_access_token', accessToken);
-        // Clean up the hash to avoid confusion with HashRouter
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        // Clean up the hash and redirect to home route for HashRouter
+        window.history.replaceState(null, '', window.location.pathname + window.location.search + '#/');
       }
     }
 
