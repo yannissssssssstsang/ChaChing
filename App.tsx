@@ -283,7 +283,14 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); }, [receiptConfig]);
   useEffect(() => { localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); }, [settlementConfig]);
   useEffect(() => { localStorage.setItem('stall_offline_mode', String(isOfflineMode)); }, [isOfflineMode]);
-  useEffect(() => { localStorage.setItem('stall_dark_mode', String(isDarkMode)); }, [isDarkMode]);
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    localStorage.setItem('stall_dark_mode', String(isDarkMode));
+  }, [isDarkMode]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -461,12 +468,12 @@ const App: React.FC = () => {
 
   if (isInitialCloudLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-blue-600 rounded-[32px] flex items-center justify-center shadow-2xl shadow-blue-200 animate-bounce mb-8">
-           <i className="fas fa-cash-register text-white text-3xl"></i>
+      <div className="min-h-screen bg-main flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+        <div className="w-16 h-16 bg-accent rounded-3xl flex items-center justify-center shadow-2xl shadow-accent/20 animate-pulse mb-8">
+           <i className="fas fa-cash-register text-white text-2xl"></i>
         </div>
-        <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-2">Restoring Your Stall...</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Syncing Registry & Binary Assets</p>
+        <h2 className="text-2xl font-bold tracking-tight mb-2">Restoring Stallmate</h2>
+        <p className="text-muted text-sm uppercase tracking-widest">Syncing your data...</p>
       </div>
     );
   }

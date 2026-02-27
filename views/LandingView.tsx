@@ -12,31 +12,31 @@ interface LandingViewProps {
 
 const LandingView: React.FC<LandingViewProps> = ({ onLogin, lang, setLang, isLoggingIn, loginError }) => {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden text-slate-900">
-      {/* Background Accents - THEME COLOR #0088CC */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#0088CC] rounded-full blur-[120px] opacity-10"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#0088CC] rounded-full blur-[120px] opacity-5"></div>
+    <div className="min-h-screen bg-main flex flex-col items-center justify-center p-8 relative overflow-hidden transition-colors duration-500">
+      {/* Subtle Background Accents */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-accent rounded-full blur-[140px] opacity-5"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-accent rounded-full blur-[140px] opacity-5"></div>
 
-      <div className="max-w-md w-full text-center space-y-12 z-10">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-24 h-24 bg-blue-600 rounded-[32px] flex items-center justify-center shadow-2xl shadow-blue-200">
-            <i className="fas fa-cash-register text-white text-4xl"></i>
+      <div className="max-w-md w-full text-center space-y-16 z-10 animate-fade-in">
+        <div className="flex flex-col items-center gap-8">
+          <div className="w-20 h-20 bg-accent rounded-[28px] flex items-center justify-center shadow-2xl shadow-accent/30">
+            <i className="fas fa-cash-register text-white text-3xl"></i>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-5xl font-black tracking-tighter text-slate-900">
-              StallMate
+          <div className="space-y-3">
+            <h1 className="text-6xl font-bold tracking-tight">
+              Stallmate
             </h1>
-            <p className="text-sm font-bold text-blue-600 uppercase tracking-[0.4em]">
+            <p className="text-sm font-semibold text-accent uppercase tracking-[0.3em]">
               {lang === Language.ZH ? '智能零售生態系統' : 'Intelligent Retail Ecosystem'}
             </p>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <button 
             onClick={onLogin}
             disabled={isLoggingIn}
-            className={`w-full bg-slate-900 text-white p-6 rounded-[28px] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-slate-200 transition-all active:scale-95 flex items-center justify-center gap-4 group hover:bg-slate-800 ${isLoggingIn ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full bg-accent text-white p-6 rounded-3xl font-bold text-sm shadow-2xl shadow-accent/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-4 group ${isLoggingIn ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isLoggingIn ? (
               <i className="fas fa-circle-notch fa-spin"></i>
@@ -54,39 +54,38 @@ const LandingView: React.FC<LandingViewProps> = ({ onLogin, lang, setLang, isLog
           </button>
 
           {loginError && (
-            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold flex items-center gap-3 animate-shake">
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-xs font-bold flex items-center gap-3 animate-shake">
               <i className="fas fa-circle-exclamation"></i>
               <span>{loginError}</span>
             </div>
           )}
         </div>
 
-        {/* Privacy Note for End Users */}
-        <div className="bg-blue-50/50 p-6 rounded-[32px] border border-blue-100/50 text-left space-y-3">
-          <div className="flex items-center gap-3 text-blue-600">
+        {/* Privacy Note */}
+        <div className="glass-panel p-8 rounded-[32px] text-left space-y-4 border border-color">
+          <div className="flex items-center gap-3 text-accent">
             <i className="fas fa-shield-halved text-sm"></i>
-            <p className="text-[10px] font-black uppercase tracking-widest">Privacy Guarantee</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest">Privacy Guarantee</p>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 leading-relaxed">
+          <p className="text-xs font-medium text-muted leading-relaxed">
             {lang === Language.ZH 
               ? '您的數據（庫存、銷售記錄）將私密地儲存在您自己的 Google Drive 中。我們不會訪問您的個人檔案，也不會儲存您的客戶資料。' 
               : 'Your data (inventory, sales) is stored privately in your own Google Drive. We never access your personal files or store your customer data on our servers.'}
           </p>
-          <div className="pt-2 flex gap-4">
+          <div className="pt-2 flex gap-6">
             <a 
               href="/privacy.html" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+              className="text-[10px] font-bold text-accent uppercase tracking-widest hover:underline"
             >
               {lang === Language.ZH ? '隱私政策' : 'Privacy Policy'}
             </a>
-            <span className="text-slate-300">|</span>
             <a 
               href="/tos.html" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+              className="text-[10px] font-bold text-accent uppercase tracking-widest hover:underline"
             >
               {lang === Language.ZH ? '服務條款' : 'Terms of Service'}
             </a>
