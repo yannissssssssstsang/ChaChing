@@ -1,126 +1,167 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --radius-3xl: 24px;
-  --color-accent: #3b82f6; /* Electric Blue */
-  --color-accent-hover: #2563eb;
 }
 
 :root {
-  --bg-main: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.7);
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --border-color: rgba(0, 0, 0, 0.05);
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.3);
+    --primary-theme: #0088CC;
+    --primary-theme-hover: #0077BB;
+    --primary-theme-light: #EBF5FB;
+    --primary-theme-border: #AED6F1;
+    --primary-theme-shadow: rgba(0, 136, 204, 0.2);
 }
 
+body { 
+    font-family: 'Inter', sans-serif; 
+    transition: background-color 0.3s ease; 
+}
+
+/* THEME OVERRIDES */
+.bg-blue-600 { background-color: var(--primary-theme) !important; }
+.hover\:bg-blue-700:hover { background-color: var(--primary-theme-hover) !important; }
+.text-blue-600 { color: var(--primary-theme) !important; }
+.text-blue-500 { color: var(--primary-theme) !important; }
+.bg-blue-50 { background-color: var(--primary-theme-light) !important; }
+.border-blue-600 { border-color: var(--primary-theme) !important; }
+.border-blue-100 { border-color: var(--primary-theme-border) !important; }
+.border-blue-200 { border-color: var(--primary-theme-border) !important; }
+.shadow-blue-100, .shadow-blue-200, .shadow-blue-500\/20 { 
+    box-shadow: 0 10px 15px -3px var(--primary-theme-shadow), 0 4px 6px -4px var(--primary-theme-shadow) !important; 
+}
+.bg-blue-500 { background-color: var(--primary-theme) !important; }
+
+.animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+/* Dashboard styling */
+.dashboard-card {
+    background: white;
+    border-radius: 1.5rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: all 0.3s ease;
+}
+#analytics-map {
+    width: 100%;
+    border-radius: 1rem;
+    z-index: 1;
+}
+
+/* LEAFLET CSS FIXES */
+.leaflet-container img {
+    max-width: none !important;
+    max-height: none !important;
+}
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.sync-pulse {
+    animation: pulse-theme 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-theme {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+
+/* DARK MODE UI REPLACEMENT - ENHANCED CONTRAST */
 .dark-mode {
-  --bg-main: #020617;
-  --bg-card: rgba(15, 23, 42, 0.7);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.05);
-  --glass-bg: rgba(15, 23, 42, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.1);
+    background-color: #020617 !important; 
+    color: #f8fafc !important; 
+}
+.dark-mode .bg-white, 
+.dark-mode .bg-slate-50, 
+.dark-mode .bg-slate-100 {
+    background-color: #0f172a !important; 
+    border-color: #1e293b !important; 
+}
+.dark-mode .bg-slate-200, .dark-mode .bg-slate-300 {
+    background-color: #1e293b !important; 
+}
+.dark-mode .text-slate-800, 
+.dark-mode .text-slate-900, 
+.dark-mode .text-slate-700 {
+    color: #f8fafc !important; 
+}
+.dark-mode .text-slate-400, 
+.dark-mode .text-slate-500,
+.dark-mode .text-slate-600 {
+    color: #cbd5e1 !important; 
+}
+.dark-mode .dashboard-card {
+    background: #0f172a !important;
+    border: 1px solid #1e293b !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+.dark-mode .border-slate-50,
+.dark-mode .border-slate-100,
+.dark-mode .border-slate-200 {
+    border-color: #1e293b !important;
+}
+.dark-mode input, .dark-mode select, .dark-mode textarea {
+    background-color: #020617 !important;
+    border-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+/* Specific accent fixes for dark mode */
+.dark-mode .bg-blue-50 { background-color: rgba(0, 136, 204, 0.15) !important; }
+.dark-mode .bg-emerald-50 { background-color: rgba(5, 150, 105, 0.15) !important; }
+.dark-mode .bg-red-50 { background-color: rgba(220, 38, 38, 0.15) !important; }
+.dark-mode .bg-amber-50 { background-color: rgba(217, 119, 6, 0.15) !important; }
+
+.dark-mode .text-blue-600 { color: #5DADE2 !important; }
+.dark-mode .text-emerald-600 { color: #34d399 !important; }
+.dark-mode .text-red-600 { color: #f87171 !important; }
+.dark-mode .text-amber-600 { color: #fbbf24 !important; }
+
+/* Override bright shadows in dark mode */
+.dark-mode .shadow-blue-100, 
+.dark-mode .shadow-blue-200, 
+.dark-mode .shadow-emerald-100, 
+.dark-mode .shadow-slate-100, 
+.dark-mode .shadow-slate-200 {
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.6) !important;
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Leaflet Dark Theme adjustment */
+.dark-mode #analytics-map {
+    filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(110%);
+}
+.custom-map-popup .leaflet-popup-content-wrapper {
+    background: white;
+    border-radius: 1rem;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.dark-mode .custom-map-popup .leaflet-popup-content-wrapper {
+    background: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+}
+.dark-mode .custom-map-popup .leaflet-popup-tip {
+    background: #1e293b;
 }
 
-/* Modern Minimalist Components */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
+/* Custom Scrollbar for better dark mode visibility */
+.dark-mode ::-webkit-scrollbar {
+    width: 8px;
 }
-
-.card-minimal {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-3xl);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.dark-mode ::-webkit-scrollbar-track {
+    background: #020617;
 }
-
-.card-minimal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 10px;
 }
-
-.dark-mode .card-minimal:hover {
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5);
-}
-
-/* Typography Hierarchy */
-h1, h2, h3, h4 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-.text-muted {
-  color: var(--text-secondary);
-  font-weight: 400;
-}
-
-/* Buttons */
-.btn-primary {
-  background-color: var(--color-accent);
-  color: white;
-  border-radius: 9999px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-accent-hover);
-  transform: scale(1.02);
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
 }
 
 /* Hide number input arrows */
@@ -132,14 +173,3 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
-
-/* Leaflet Overrides */
-.leaflet-container {
-  border-radius: var(--radius-3xl);
-  overflow: hidden;
-}
-
-.dark-mode .leaflet-tile-pane {
-  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-}
-
