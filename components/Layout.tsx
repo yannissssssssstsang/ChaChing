@@ -41,25 +41,28 @@ const Layout: React.FC<LayoutProps> = ({
   const NavItem = ({ to, icon, label }: { to: string, icon: string, label: string }) => (
     <NavLink 
       to={to} 
-      className={({ isActive }) => `flex flex-col md:flex-row items-center gap-1 md:gap-4 p-2 md:px-6 md:py-4 transition-all rounded-2xl ${isActive ? 'text-blue-600 bg-blue-50 md:bg-blue-600 md:text-white' : 'text-slate-400 hover:text-slate-600 md:hover:bg-slate-50'}`}
+      className={({ isActive }) => `flex flex-col md:flex-row items-center gap-2 md:gap-4 p-3 md:px-6 md:py-3 transition-all rounded-2xl ${isActive ? 'text-accent bg-accent/10' : 'text-muted hover:text-primary hover:bg-accent/5'}`}
     >
-      <i className={`fas ${icon} text-lg md:text-xl`}></i>
-      <span className="text-[9px] md:text-sm uppercase md:capitalize font-bold">{label}</span>
+      <i className={`fas ${icon} text-lg`}></i>
+      <span className="text-[10px] md:text-sm font-semibold tracking-tight">{label}</span>
     </NavLink>
   );
 
   return (
-    <div className={`flex flex-col md:flex-row h-screen overflow-hidden transition-colors duration-300 ${isDarkMode ? 'dark-mode bg-slate-950' : 'bg-white md:bg-slate-50'}`}>
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-main">
       {/* Sidebar (Desktop & Tablet) */}
-      <aside className={`hidden md:flex flex-col w-64 border-r shrink-0 p-6 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-            <i className="fas fa-cash-register text-white"></i>
+      <aside className="hidden md:flex flex-col w-72 shrink-0 p-8 glass-panel border-r border-color">
+        <div className="flex items-center gap-4 mb-12 px-2">
+          <div className="w-12 h-12 bg-accent rounded-2xl flex items-center justify-center shadow-2xl shadow-accent/30">
+            <i className="fas fa-cash-register text-white text-xl"></i>
           </div>
-          <h1 className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{t.appName}</h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">{t.appName}</h1>
+            <p className="text-[10px] text-muted font-medium uppercase tracking-widest">Market POS</p>
+          </div>
         </div>
 
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-1">
           <NavItem to="/" icon="fa-cash-register" label={t.ordering} />
           <NavItem to="/inventory" icon="fa-boxes-stacked" label={t.inventory} />
           <NavItem to="/records" icon="fa-receipt" label={t.records} />
@@ -67,72 +70,66 @@ const Layout: React.FC<LayoutProps> = ({
           <NavItem to="/settings" icon="fa-cog" label={t.settings} />
         </nav>
 
-        <div className={`pt-6 border-t space-y-3 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-          {/* Sidebar Dark Mode Toggle */}
-          <button 
-            onClick={onToggleDarkMode}
-            className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'}`}
-          >
+        <div className="pt-8 mt-8 border-t border-color space-y-4">
+          <div className="flex items-center justify-between px-4 py-2 bg-accent/5 rounded-2xl">
             <div className="flex items-center gap-3">
-              <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-sm`}></i>
-              <span className="text-[10px] font-bold uppercase tracking-widest">{isDarkMode ? 'Dark' : 'Light'}</span>
+              <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-accent`}></i>
+              <span className="text-xs font-semibold">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
             </div>
-            <div className={`w-8 h-4 rounded-full relative transition-colors ${isDarkMode ? 'bg-blue-500' : 'bg-slate-300'}`}>
-              <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${isDarkMode ? 'right-0.5' : 'left-0.5'}`}></div>
-            </div>
-          </button>
+            <button 
+              onClick={onToggleDarkMode}
+              className={`w-10 h-5 rounded-full relative transition-all ${isDarkMode ? 'bg-accent' : 'bg-slate-300'}`}
+            >
+              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${isDarkMode ? 'right-1' : 'left-1'}`}></div>
+            </button>
+          </div>
 
-          {/* Sidebar Language Toggle */}
           <button 
             onClick={() => setLang(lang === Language.EN ? Language.ZH : Language.EN)}
-            className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'}`}
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-accent/5 hover:bg-accent/10 transition-all group"
           >
             <div className="flex items-center gap-3">
-              <i className="fas fa-globe text-sm"></i>
-              <span className="text-[10px] font-bold uppercase tracking-widest">{lang === Language.EN ? 'English' : '繁體中文'}</span>
+              <i className="fas fa-globe text-muted group-hover:text-accent transition-colors"></i>
+              <span className="text-xs font-semibold">{lang === Language.EN ? 'English' : '繁體中文'}</span>
             </div>
-            <span className="text-[10px] font-black text-blue-600">{lang === Language.EN ? 'ZH' : 'EN'}</span>
+            <span className="text-[10px] font-bold text-accent">{lang === Language.EN ? 'ZH' : 'EN'}</span>
           </button>
 
           <button 
             onClick={onLogout}
-            className={`w-full py-3 rounded-xl font-black transition-colors text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 border ${isDarkMode ? 'bg-red-950/20 border-red-900/30 text-red-500 hover:bg-red-950/40' : 'bg-red-50 border-red-100 text-red-600 hover:bg-red-100'}`}
+            className="w-full p-4 rounded-2xl font-bold text-xs text-red-500 bg-red-500/5 hover:bg-red-500/10 transition-all flex items-center justify-center gap-3"
           >
             <i className="fas fa-arrow-right-from-bracket"></i>
-            Sign Out
+            {t.logout || 'Sign Out'}
           </button>
           
-          <div className="flex items-center justify-between px-3 pt-1">
-             <span className={`text-[9px] font-black uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}>
+          <div className="flex items-center justify-between px-4 pt-2">
+             <span className="text-[10px] font-semibold text-muted uppercase tracking-widest">
                {isSyncing ? 'Syncing...' : (isOnline ? 'Cloud Active' : 'Offline')}
              </span>
-             <div className={`w-1.5 h-1.5 rounded-full ${isSyncing ? 'bg-blue-500 sync-pulse' : (isOnline ? 'bg-green-500' : 'bg-amber-500 animate-pulse')}`}></div>
+             <div className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-accent animate-pulse' : (isOnline ? 'bg-emerald-500' : 'bg-amber-500')}`}></div>
           </div>
         </div>
       </aside>
 
       {/* Mobile Header */}
-      <header className={`md:hidden text-white p-4 flex justify-between items-center shrink-0 z-50 shadow-md transition-colors duration-300 ${isDarkMode ? 'bg-slate-900' : (isSyncing ? 'bg-blue-500' : (isOnline ? 'bg-blue-600' : 'bg-slate-800'))}`}>
+      <header className="md:hidden glass-panel p-4 flex justify-between items-center shrink-0 z-50 border-b border-color">
         <div className="flex items-center gap-3">
-           <h1 className="text-xl font-bold tracking-tight">{t.appName}</h1>
-           {isSyncing ? (
-             <i className="fas fa-sync fa-spin text-[10px]"></i>
-           ) : !isOnline && (
-             <span className="text-[10px] bg-amber-500 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Offline</span>
-           )}
+           <div className="w-8 h-8 bg-accent rounded-xl flex items-center justify-center">
+             <i className="fas fa-cash-register text-white text-sm"></i>
+           </div>
+           <h1 className="text-lg font-bold tracking-tight">{t.appName}</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button 
             onClick={onToggleDarkMode}
-            className={`w-12 h-10 rounded-xl flex flex-col items-center justify-center transition-all border ${isDarkMode ? 'bg-slate-800 text-blue-400 border-slate-700' : 'bg-white/20 text-white border-transparent'}`}
+            className="w-10 h-10 rounded-2xl flex items-center justify-center bg-accent/5 text-accent"
           >
-            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-[10px]`}></i>
-            <span className="text-[7px] font-black uppercase tracking-tighter mt-0.5">{isDarkMode ? 'DARK' : 'LIGHT'}</span>
+            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'}`}></i>
           </button>
-          
           <button 
             onClick={() => setLang(lang === Language.EN ? Language.ZH : Language.EN)}
-            className="bg-white/20 hover:bg-white/30 px-3 h-10 rounded-xl text-xs font-bold transition-colors"
+            className="h-10 px-4 rounded-2xl bg-accent/5 text-accent text-xs font-bold"
           >
             {lang === Language.EN ? '繁中' : 'EN'}
           </button>
@@ -140,12 +137,12 @@ const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className={`flex-1 overflow-y-auto relative p-4 md:p-8 lg:p-12 transition-colors duration-300 ${isDarkMode ? 'bg-slate-950' : 'bg-white md:bg-slate-50'}`}>
-        <div className="max-w-7xl mx-auto">{children}</div>
+      <main className="flex-1 overflow-y-auto relative p-6 md:p-12 lg:p-16">
+        <div className="max-w-6xl mx-auto animate-fade-in">{children}</div>
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className={`md:hidden fixed bottom-0 left-0 right-0 border-t flex justify-around items-center py-2 px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-color flex justify-around items-center py-3 px-4 z-50">
         <NavItem to="/" icon="fa-cash-register" label={t.ordering} />
         <NavItem to="/inventory" icon="fa-boxes-stacked" label={t.inventory} />
         <NavItem to="/records" icon="fa-receipt" label={t.records} />

@@ -41,6 +41,18 @@ const App: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(localStorage.getItem('stall_last_sync'));
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const [isOfflineMode, setIsOfflineMode] = useState(localStorage.getItem('stall_offline_mode') === 'true');
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('stall_dark_mode') === 'true');
   const [isInitialCloudLoading, setIsInitialCloudLoading] = useState(false);
@@ -80,6 +92,9 @@ const App: React.FC = () => {
     if (savedTelegram) setTelegramConfig(JSON.parse(savedTelegram));
     if (savedReceipt) setReceiptConfig(JSON.parse(savedReceipt));
     if (savedSettlement) setSettlementConfig(JSON.parse(savedSettlement));
+    
+    // Mark as hydrated after loading local data
+    isHydrated.current = true;
   }, []);
 
   const getLocalDateString = (date: Date) => {
@@ -273,17 +288,93 @@ const App: React.FC = () => {
     }
   }, [googleToken]);
 
-  useEffect(() => { localStorage.setItem('stall_lang', lang); }, [lang]);
-  useEffect(() => { localStorage.setItem('stall_products', JSON.stringify(products)); }, [products]);
-  useEffect(() => { localStorage.setItem('stall_transactions', JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem('stall_reports', JSON.stringify(reports)); }, [reports]);
-  useEffect(() => { localStorage.setItem('stall_change_logs', JSON.stringify(changeLogs)); }, [changeLogs]);
-  useEffect(() => { localStorage.setItem('stall_payment_qrs', JSON.stringify(paymentQRCodes)); }, [paymentQRCodes]);
-  useEffect(() => { localStorage.setItem('stall_telegram_config', JSON.stringify(telegramConfig)); }, [telegramConfig]);
-  useEffect(() => { localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig)); }, [receiptConfig]);
-  useEffect(() => { localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig)); }, [settlementConfig]);
-  useEffect(() => { localStorage.setItem('stall_offline_mode', String(isOfflineMode)); }, [isOfflineMode]);
-  useEffect(() => { localStorage.setItem('stall_dark_mode', String(isDarkMode)); }, [isDarkMode]);
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_lang', lang);
+    } catch (e) {
+      console.error('Failed to save lang to localStorage', e);
+    }
+  }, [lang]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_products', JSON.stringify(products));
+    } catch (e) {
+      console.error('Failed to save products to localStorage', e);
+    }
+  }, [products]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_transactions', JSON.stringify(transactions));
+    } catch (e) {
+      console.error('Failed to save transactions to localStorage', e);
+    }
+  }, [transactions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_reports', JSON.stringify(reports));
+    } catch (e) {
+      console.error('Failed to save reports to localStorage', e);
+    }
+  }, [reports]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_change_logs', JSON.stringify(changeLogs));
+    } catch (e) {
+      console.error('Failed to save change logs to localStorage', e);
+    }
+  }, [changeLogs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_payment_qrs', JSON.stringify(paymentQRCodes));
+    } catch (e) {
+      console.error('Failed to save payment QRs to localStorage', e);
+    }
+  }, [paymentQRCodes]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_telegram_config', JSON.stringify(telegramConfig));
+    } catch (e) {
+      console.error('Failed to save telegram config to localStorage', e);
+    }
+  }, [telegramConfig]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_receipt_config', JSON.stringify(receiptConfig));
+    } catch (e) {
+      console.error('Failed to save receipt config to localStorage', e);
+    }
+  }, [receiptConfig]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_settlement_config', JSON.stringify(settlementConfig));
+    } catch (e) {
+      console.error('Failed to save settlement config to localStorage', e);
+    }
+  }, [settlementConfig]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_offline_mode', String(isOfflineMode));
+    } catch (e) {
+      console.error('Failed to save offline mode to localStorage', e);
+    }
+  }, [isOfflineMode]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stall_dark_mode', String(isDarkMode));
+    } catch (e) {
+      console.error('Failed to save dark mode to localStorage', e);
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -405,7 +496,13 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [products, transactions, reports, changeLogs, lang, telegramConfig, paymentQRCodes, receiptConfig, settlementConfig, isLoggedIn, isOnline, isOfflineMode, handleCloudSync]);
 
-  const handleCompleteSale = (tx: Transaction) => setTransactions(prev => [...prev, tx]);
+  const handleCompleteSale = (tx: Transaction) => {
+    if (!tx) return;
+    setTransactions(prev => {
+      const current = Array.isArray(prev) ? prev : [];
+      return [...current, tx];
+    });
+  };
   const handleUpdateStock = (productId: string, diff: number) => {
     setProducts(prev => prev.map(p => {
       if (p.id === productId) {

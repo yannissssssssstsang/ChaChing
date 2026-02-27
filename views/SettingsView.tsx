@@ -229,7 +229,30 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 
       <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Cloud Backup & Recovery</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Cloud Backup & Recovery</h3>
+            
+            {/* Live Status Indicator */}
+            <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
+              <div className={`w-2 h-2 rounded-full ${
+                isOfflineMode ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' :
+                syncStatus === 'syncing' ? 'bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.4)]' :
+                syncStatus === 'error' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
+                'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+              }`}></div>
+              <span className={`text-[9px] font-black uppercase tracking-widest ${
+                isOfflineMode ? 'text-amber-600' :
+                syncStatus === 'syncing' ? 'text-blue-600' :
+                syncStatus === 'error' ? 'text-red-600' :
+                'text-emerald-600'
+              }`}>
+                {isOfflineMode ? 'Offline' :
+                 syncStatus === 'syncing' ? 'Syncing' :
+                 syncStatus === 'error' ? 'Sync Error' :
+                 'Synced'}
+              </span>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={handleManualDownload}
