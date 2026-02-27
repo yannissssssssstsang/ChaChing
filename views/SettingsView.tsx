@@ -566,12 +566,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       <input type="file" ref={modalFileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
     </div>
   );
-
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-      <input type="file" ref={brandingInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-      <input type="file" ref={modalFileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-    </div>
-  );
 };
 
 export default SettingsView;

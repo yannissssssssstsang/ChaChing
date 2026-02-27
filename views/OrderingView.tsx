@@ -683,7 +683,7 @@ const OrderingView: React.FC<OrderingViewProps> = ({ products, lang, onCompleteS
                   </div>
                 )}
               </div>
-            )}}
+            )}
           </div>
         </div>
       )}
