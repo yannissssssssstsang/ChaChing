@@ -148,23 +148,23 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
   };
 
   return (
-    <div className="space-y-10 pb-24 md:pb-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+    <div className="space-y-8 pb-20 md:pb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-black tracking-tighter">{t.records}</h2>
-          <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Transaction Log & History</p>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t.records}</h2>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Transaction Log & History</p>
         </div>
 
-        <div className="bg-white p-1.5 rounded-[24px] border border-zinc-100 shadow-sm flex items-center gap-1.5">
+        <div className="bg-white p-1.5 rounded-[20px] border border-slate-100 shadow-sm flex items-center gap-1">
           <button 
             onClick={() => setRange('today')}
-            className={`px-7 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${range === 'today' ? 'bg-black text-white shadow-xl shadow-black/10' : 'text-zinc-400 hover:text-black hover:bg-zinc-50'}`}
+            className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'today' ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
           >
             {lang === Language.ZH ? '今日' : 'Today'}
           </button>
           <button 
             onClick={() => setRange('all')}
-            className={`px-7 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${range === 'all' ? 'bg-black text-white shadow-xl shadow-black/10' : 'text-zinc-400 hover:text-black hover:bg-zinc-50'}`}
+            className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${range === 'all' ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
           >
             {lang === Language.ZH ? '全部' : 'All Time'}
           </button>
@@ -173,30 +173,30 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
 
       {/* Payment Method Summary Section */}
       {paymentSummary.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 animate-scale-in">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-scale-in">
           {paymentSummary.map(([method, amount]) => (
-            <div key={method} className={`p-5 rounded-[32px] border shadow-sm bg-white border-zinc-100 flex flex-col gap-3 transition-all hover:shadow-xl hover:border-zinc-200`}>
+            <div key={method} className={`p-4 rounded-[24px] border shadow-sm ${getMethodBgLite(method)} flex flex-col gap-2`}>
               <div className="flex items-center justify-between">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm bg-zinc-50 text-black border border-zinc-100`}>
-                  <i className={`fas ${getMethodIcon(method)} text-[11px]`}></i>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm ${getMethodColor(method)}`}>
+                  <i className={`fas ${getMethodIcon(method)} text-[10px]`}></i>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-widest text-zinc-400`}>{method}</span>
+                <span className={`text-[9px] font-black uppercase tracking-widest opacity-60 ${getMethodText(method)}`}>{method}</span>
               </div>
               <div>
-                <p className={`text-2xl font-extrabold text-black tracking-tight`}>${amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
-                <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">Net Collected</p>
+                <p className={`text-xl font-black ${getMethodText(method)}`}>${amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Net Collected</p>
               </div>
             </div>
           ))}
         </div>
       ) : range === 'today' && transactions.length > 0 ? (
-        <div className="p-10 bg-zinc-50 border border-zinc-100 rounded-[40px] text-center">
-          <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">No transactions yet today</p>
+        <div className="p-8 bg-slate-50 border border-slate-100 rounded-[32px] text-center">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No transactions yet today</p>
         </div>
       ) : null}
 
-      <div className="space-y-5">
-        <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.25em] ml-1">
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
           {range === 'today' ? 'Today\'s Transactions' : 'Recent Transactions'}
         </h3>
         {sortedTransactions.map((tx) => {
@@ -206,31 +206,31 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
           const isPartiallyRefunded = effectiveTotal > 0 && tx.refunds && tx.refunds.length > 0;
 
           return (
-            <div key={tx.id} className={`bg-white p-6 rounded-[32px] border shadow-sm space-y-5 hover:shadow-xl transition-all group ${isFullyRefunded ? 'opacity-60 border-red-100' : 'border-zinc-100'}`}>
+            <div key={tx.id} className={`bg-white p-5 rounded-3xl border shadow-sm space-y-4 hover:shadow-md transition-shadow group ${isFullyRefunded ? 'opacity-60 border-red-100' : 'border-slate-100'}`}>
               <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${
-                    tx.paymentMethod === 'CASH' ? 'bg-emerald-500 shadow-emerald-100' : 
-                    tx.paymentMethod === 'PAYME' ? 'bg-red-500 shadow-red-100' :
-                    tx.paymentMethod === 'ALIPAY' ? 'bg-sky-500 shadow-sky-100' : 
-                    tx.paymentMethod === 'FPS' ? 'bg-orange-500 shadow-orange-100' : 'bg-zinc-800 shadow-zinc-100'
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm ${
+                    tx.paymentMethod === 'CASH' ? 'bg-emerald-500' : 
+                    tx.paymentMethod === 'PAYME' ? 'bg-red-500' :
+                    tx.paymentMethod === 'ALIPAY' ? 'bg-sky-500' : 
+                    tx.paymentMethod === 'FPS' ? 'bg-orange-500' : 'bg-slate-500'
                   }`}>
                     <i className={`fas ${
                       tx.paymentMethod === 'CASH' ? 'fa-money-bill-wave' : 
                       tx.paymentMethod === 'PAYME' ? 'fa-qrcode' :
                       tx.paymentMethod === 'ALIPAY' ? 'fa-mobile-screen' : 
                       tx.paymentMethod === 'FPS' ? 'fa-bolt' : 'fa-wallet'
-                    } text-sm`}></i>
+                    } text-xs`}></i>
                   </div>
                   <div>
-                    <div className="flex items-center gap-3">
-                      <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         {new Date(tx.timestamp).toLocaleDateString(lang === Language.ZH ? 'zh-HK' : 'en-US', { day: '2-digit', month: 'short' })}
                       </p>
-                      {isFullyRefunded && <span className="text-[9px] bg-red-100 text-red-600 px-2.5 py-1 rounded-full font-bold uppercase tracking-widest">{t.refunded}</span>}
-                      {isPartiallyRefunded && <span className="text-[9px] bg-amber-100 text-amber-600 px-2.5 py-1 rounded-full font-bold uppercase tracking-widest">{t.partialRefund}</span>}
+                      {isFullyRefunded && <span className="text-[8px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">{t.refunded}</span>}
+                      {isPartiallyRefunded && <span className="text-[8px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">{t.partialRefund}</span>}
                     </div>
-                    <p className="text-base font-bold text-black">
+                    <p className="text-sm font-black text-slate-800">
                       {new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -238,30 +238,30 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                 <div className="text-right">
                   <div className="flex flex-col items-end">
                     {tx.discountAmount > 0 && !isFullyRefunded && (
-                      <span className="text-[11px] font-bold text-zinc-300 line-through tracking-tight">
+                      <span className="text-[10px] font-black text-slate-300 line-through tracking-tight">
                         ${tx.originalTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       </span>
                     )}
-                    <p className={`text-xl font-extrabold ${isFullyRefunded ? 'text-zinc-400 line-through' : 'text-black'}`}>
+                    <p className={`text-lg font-black ${isFullyRefunded ? 'text-slate-400 line-through' : 'text-blue-600'}`}>
                       ${effectiveTotal.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 justify-end mt-1">
-                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-zinc-50 text-zinc-400 uppercase tracking-widest border border-zinc-100">
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-400 uppercase tracking-wider border border-slate-100">
                       {tx.paymentMethod}
                     </span>
                     {!isFullyRefunded && (
-                      <button onClick={() => startRefund(tx)} className="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:text-red-700 transition-colors">
-                        <i className="fas fa-undo mr-1.5"></i> {t.refund}
+                      <button onClick={() => startRefund(tx)} className="text-[9px] font-black text-red-500 uppercase tracking-widest hover:text-red-700">
+                        <i className="fas fa-undo mr-1"></i> {t.refund}
                       </button>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="bg-zinc-50/50 border border-zinc-100/50 rounded-[24px] p-5 space-y-3">
+              <div className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-4 space-y-2">
                 {tx.discountAmount > 0 && (
-                  <div className="flex justify-between items-center text-[10px] text-emerald-600 font-bold uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-100 mb-3">
+                  <div className="flex justify-between items-center text-[9px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 mb-2">
                     <span>{t.discount} ({tx.discountType === 'percentage' ? `${tx.discountValue}%` : t.oneTimeOffer})</span>
                     <span>-${tx.discountAmount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                   </div>
@@ -273,18 +273,18 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                   const remainingQty = item.quantity - refundedQty;
 
                   return (
-                    <div key={`${tx.id}-item-${idx}`} className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-3">
-                        <span className={`w-6 h-6 flex items-center justify-center bg-white border rounded-xl text-[10px] font-bold ${remainingQty <= 0 ? 'text-zinc-300 border-zinc-100' : 'text-black border-zinc-200'}`}>
+                    <div key={`${tx.id}-item-${idx}`} className="flex justify-between items-center text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-5 h-5 flex items-center justify-center bg-white border rounded-lg text-[9px] font-black ${remainingQty <= 0 ? 'text-slate-300 border-slate-100' : 'text-blue-600 border-slate-200'}`}>
                           {item.quantity}
                         </span>
-                        <span className={`font-bold uppercase tracking-tight ${remainingQty <= 0 ? 'text-zinc-300 line-through' : 'text-zinc-600'}`}>{item.name}</span>
-                        {refundedQty > 0 && <span className="text-[9px] text-red-400 font-bold italic">(-{refundedQty} {t.refunded})</span>}
+                        <span className={`font-bold ${remainingQty <= 0 ? 'text-slate-300 line-through' : 'text-slate-600'}`}>{item.name}</span>
+                        {refundedQty > 0 && <span className="text-[8px] text-red-400 font-black italic">(-{refundedQty} {t.refunded})</span>}
                       </div>
-                      <span className={`font-bold ${remainingQty <= 0 ? 'text-zinc-300 line-through' : 'text-zinc-400'}`}>
+                      <span className={`font-black ${remainingQty <= 0 ? 'text-slate-300 line-through' : 'text-slate-400'}`}>
                         ${((item.discountedPrice || item.price) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                         {item.discountedPrice && item.discountedPrice < item.price && (
-                          <span className="ml-1.5 text-[9px] line-through opacity-40">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                          <span className="ml-1 text-[8px] line-through opacity-50">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                         )}
                       </span>
                     </div>
@@ -293,25 +293,25 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
               </div>
 
               {tx.refunds && tx.refunds.length > 0 && (
-                <div className="p-4 bg-red-50/30 rounded-[24px] border border-red-50 space-y-2.5">
-                  <p className="text-[9px] font-bold text-red-400 uppercase tracking-widest">Refund History</p>
+                <div className="p-3 bg-red-50/30 rounded-2xl border border-red-50 space-y-2">
+                  <p className="text-[8px] font-black text-red-400 uppercase tracking-widest">Refund History</p>
                   {tx.refunds.map(refund => (
-                    <div key={refund.id} className="flex justify-between items-center text-[10px]">
-                      <span className="text-red-600 font-bold uppercase tracking-tight">{refund.quantity}x {refund.itemName} - {refund.reason}</span>
-                      <span className="text-red-600 font-extrabold">-${refund.amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                    <div key={refund.id} className="flex justify-between items-center text-[9px]">
+                      <span className="text-red-600 font-bold">{refund.quantity}x {refund.itemName} - {refund.reason}</span>
+                      <span className="text-red-600 font-black">-${refund.amount.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="flex justify-between items-center text-[10px] pt-1">
-                <div className="flex items-center gap-3">
-                  <span className="text-zinc-300 font-bold uppercase tracking-widest">Transaction ID</span>
-                  <span className="text-zinc-400 font-mono tracking-tighter">{tx.id}</span>
+              <div className="flex justify-between items-center text-[9px] pt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-300 font-bold uppercase">Transaction ID</span>
+                  <span className="text-slate-400 font-mono tracking-tighter">{tx.id}</span>
                 </div>
-                <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border ${isFullyRefunded ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-50 text-black border-zinc-100'}`}>
-                  <i className="fas fa-chart-line text-[9px]"></i>
-                  <span className="font-bold uppercase tracking-widest">{t.profit}: ${effectiveProfit.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${isFullyRefunded ? 'bg-slate-100 border-slate-200 text-slate-400' : 'bg-emerald-50 text-emerald-600 border-emerald-100/50'}`}>
+                  <i className="fas fa-chart-line text-[8px]"></i>
+                  <span className="font-black uppercase tracking-widest">{t.profit}: ${effectiveProfit.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 </div>
               </div>
             </div>
@@ -319,11 +319,11 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
         })}
 
         {sortedTransactions.length === 0 && (
-          <div className="text-center py-32 bg-white rounded-[48px] border border-dashed border-zinc-200">
-            <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-8">
-              <i className="fas fa-receipt text-zinc-200 text-5xl"></i>
+          <div className="text-center py-32 bg-white rounded-[40px] border border-dashed border-slate-200">
+            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="fas fa-receipt text-slate-200 text-4xl"></i>
             </div>
-            <p className="text-zinc-400 font-bold uppercase tracking-[0.25em] text-xs">
+            <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">
               {range === 'today' ? 'No transactions today' : t.noRecords}
             </p>
           </div>
@@ -332,19 +332,19 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
 
       {/* Refund Modal */}
       {refundingTransaction && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xl z-[200] flex items-end md:items-center justify-center p-6">
-          <div className="bg-white w-full max-w-lg rounded-[56px] p-10 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto border border-zinc-100">
-            <div className="flex justify-between items-center mb-8">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-end md:items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-[48px] p-6 md:p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-2xl font-extrabold text-black tracking-tighter">{t.refund}</h3>
-                <p className="text-[11px] text-zinc-400 font-bold uppercase mt-1.5 tracking-widest">Order #{refundingTransaction.id}</p>
+                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">{t.refund}</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Order #{refundingTransaction.id}</p>
               </div>
-              <button onClick={() => setRefundingTransaction(null)} className="w-12 h-12 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-400 hover:text-black transition-colors"><i className="fas fa-times"></i></button>
+              <button onClick={() => setRefundingTransaction(null)} className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><i className="fas fa-times"></i></button>
             </div>
 
-            <div className="space-y-8">
-              <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">{t.refundItems}</p>
-              <div className="space-y-4">
+            <div className="space-y-6">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.refundItems}</p>
+              <div className="space-y-3">
                 {refundingTransaction.items.map(item => {
                   const alreadyRefunded = (refundingTransaction.refunds || [])
                     .filter(r => r.itemId === item.id)
@@ -355,24 +355,24 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                   if (refundable <= 0) return null;
 
                   return (
-                    <div key={item.id} className={`p-5 rounded-[32px] border-2 transition-all flex items-center justify-between ${selected > 0 ? 'border-red-500 bg-red-50/30' : 'border-zinc-100 bg-zinc-50'}`}>
+                    <div key={item.id} className={`p-4 rounded-[28px] border-2 transition-all flex items-center justify-between ${selected > 0 ? 'border-red-500 bg-red-50/30' : 'border-slate-100 bg-slate-50'}`}>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-black uppercase tracking-tight">{item.name}</span>
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">Available: {refundable}</span>
+                        <span className="text-xs font-black text-slate-800 uppercase">{item.name}</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase">Available: {refundable}</span>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <button 
                           onClick={() => setSelectedRefundItems(prev => ({ ...prev, [item.id]: Math.max(0, (prev[item.id] || 0) - 1) }))}
-                          className="w-10 h-10 bg-white border border-zinc-200 rounded-2xl flex items-center justify-center text-zinc-400 hover:text-black transition-all active:scale-90"
+                          className="w-8 h-8 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-400"
                         >
-                          <i className="fas fa-minus text-[11px]"></i>
+                          <i className="fas fa-minus text-[10px]"></i>
                         </button>
-                        <span className="w-8 text-center text-base font-extrabold text-black">{selected}</span>
+                        <span className="w-6 text-center text-sm font-black text-slate-700">{selected}</span>
                         <button 
                           onClick={() => setSelectedRefundItems(prev => ({ ...prev, [item.id]: Math.min(refundable, (prev[item.id] || 0) + 1) }))}
-                          className="w-10 h-10 bg-red-600 border border-red-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-100 active:scale-90"
+                          className="w-8 h-8 bg-red-600 border border-red-700 rounded-xl flex items-center justify-center text-white"
                         >
-                          <i className="fas fa-plus text-[11px]"></i>
+                          <i className="fas fa-plus text-[10px]"></i>
                         </button>
                       </div>
                     </div>
@@ -380,13 +380,13 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                 })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">{t.refundReason}</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.refundReason}</label>
                   <select 
                     value={refundReason} 
                     onChange={e => setRefundReason(e.target.value)}
-                    className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] text-xs font-bold outline-none focus:border-red-500 transition-all"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold outline-none focus:border-red-500"
                   >
                     <option value="Customer Changed Mind">{t.reasonCustomer}</option>
                     <option value="Damaged Item">{t.reasonDamaged}</option>
@@ -394,12 +394,12 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
                     <option value="Other">{t.reasonOther}</option>
                   </select>
                 </div>
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">{t.refundMethod}</label>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.refundMethod}</label>
                   <select 
                     value={refundMethod} 
                     onChange={e => setRefundMethod(e.target.value)}
-                    className="w-full p-5 bg-zinc-50 border border-zinc-100 rounded-[24px] text-xs font-bold outline-none focus:border-red-500 transition-all"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold outline-none focus:border-red-500"
                   >
                     {availableRefundMethods.map(method => (
                       <option key={method} value={method}>{method}</option>
@@ -411,7 +411,7 @@ const RecordsView: React.FC<RecordsViewProps> = ({ transactions, lang, onRefund,
               <button 
                 onClick={handleProcessRefund}
                 disabled={(Object.values(selectedRefundItems) as number[]).reduce((a, b) => a + b, 0) === 0}
-                className="w-full bg-red-600 text-white p-6 rounded-[28px] font-bold uppercase tracking-widest shadow-2xl shadow-red-100 disabled:opacity-30 transition-all active:scale-[0.98]"
+                className="w-full bg-red-600 text-white p-6 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-red-100 disabled:opacity-50 transition-all active:scale-[0.98]"
               >
                 {t.processRefund}
               </button>

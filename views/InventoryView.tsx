@@ -79,7 +79,6 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   const [confirmModal, setConfirmModal] = useState<{ show: boolean, type: 'batch_delete', targetIds?: string[] }>({ show: false, type: 'batch_delete' });
 
   const localInputRef = useRef<HTMLInputElement>(null);
-  const aiInputRef = useRef<HTMLInputElement>(null);
   const manualImageInputRef = useRef<HTMLInputElement>(null);
   const touchStartRef = useRef<{ x: number, y: number } | null>(null);
   const isHorizontalSwipe = useRef<boolean | null>(null);
@@ -241,48 +240,6 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       });
       const thumb = await optimizeImage(base64, 400);
       setEditingProduct({ ...editingProduct, image: thumb });
-    }
-  };
-
-  const handleAIScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsProcessing(true);
-    setProcessingProgress({ current: 0, total: 1, message: lang === Language.ZH ? '正在使用 AI 掃描...' : 'Scanning with AI...' });
-
-    try {
-      const base64 = await new Promise<string>((res) => {
-        const reader = new FileReader();
-        reader.onloadend = () => res(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-
-      const thumb = await optimizeImage(base64, 400);
-      const result = await extractProductInfo(base64);
-
-      if (result) {
-        const newProd: Product = {
-          id: Math.random().toString(36).substr(2, 9),
-          name: result.name.substring(0, 20),
-          price: result.price,
-          cost: result.cost,
-          category: result.category,
-          stock: 0,
-          image: thumb,
-          isExtracting: false
-        };
-        onAddProduct(newProd);
-      } else {
-        alert(lang === Language.ZH ? 'AI 掃描失敗，請重試' : 'AI scan failed, please try again');
-      }
-    } catch (err) {
-      console.error("AI Scan error:", err);
-      alert(lang === Language.ZH ? '掃描出錯' : 'Error during scan');
-    } finally {
-      setIsProcessing(false);
-      setShowAddMenu(false);
-      if (aiInputRef.current) aiInputRef.current.value = '';
     }
   };
 
@@ -472,14 +429,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       </div>
 
       {showAddMenu && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-scale-in" onClick={e => e.stopPropagation()}>
-          <button onClick={() => aiInputRef.current?.click()} className="flex flex-col items-center justify-center gap-3 p-8 bg-blue-600 text-white rounded-[32px] hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 group">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fas fa-magic text-2xl"></i></div>
-            <div>
-              <p className="font-black uppercase tracking-wider text-[11px] mb-1">Scan with AI</p>
-              <p className="text-[9px] opacity-70 font-bold uppercase tracking-widest">Auto Extract Info</p>
-            </div>
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-scale-in" onClick={e => e.stopPropagation()}>
           <button onClick={() => localInputRef.current?.click()} className="flex flex-col items-center justify-center gap-3 p-8 bg-white border border-slate-100 rounded-[32px] hover:bg-slate-50 transition-all shadow-sm group">
             <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><i className="fas fa-laptop-code text-2xl"></i></div>
             <div>
@@ -774,7 +724,6 @@ const InventoryView: React.FC<InventoryViewProps> = ({
         </div>
       )}
       <input type="file" ref={localInputRef} onChange={handleLocalUpload} className="hidden" multiple accept=".xlsx,image/*" />
-      <input type="file" ref={aiInputRef} onChange={handleAIScan} className="hidden" accept="image/*" capture="environment" />
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { AIExtractionResult, ReceiptConfig } from "../types";
  */
 export const extractProductInfo = async (base64Image: string, retryCount = 0): Promise<AIExtractionResult | null> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const mimeType = base64Image.includes(';') ? base64Image.split(';')[0].split(':')[1] : "image/jpeg";
     const data = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
 
@@ -51,7 +51,7 @@ export const extractProductInfo = async (base64Image: string, retryCount = 0): P
  */
 export const extractBusinessCardInfo = async (base64Image: string): Promise<Partial<ReceiptConfig> | null> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const mimeType = base64Image.includes(';') ? base64Image.split(';')[0].split(':')[1] : "image/jpeg";
     const data = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
 
